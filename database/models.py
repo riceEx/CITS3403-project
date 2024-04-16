@@ -19,10 +19,26 @@ class User(UserMixin, Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def get_id(self):
+        # Used by Flask-Login to manage user sessions
+        return str(self.id)
+
+    def is_authenticated(self):
+        # Assuming all users are authenticated once they are registered
+        return True
+
+    def is_active(self):
+        # Assuming all users are active by default
+        return True
+
+    def is_anonymous(self):
+        # We don't have anonymous users, so always return False
+        return False
 
 class Post(Model):
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("User.id"))
+    user_id = Column(Integer, ForeignKey("user.id"))
     datetime = Column(DateTime(100), server_default=func.now())
     content = Column(String(128), nullable=False)
     comments = relationship('Comment', backref='post', lazy=True) # one to many, this will add a post attribute to the comment class
@@ -32,26 +48,10 @@ class Post(Model):
 
 class Comment(Model):
     id = Column(Integer, primary_key=True)
-    post_id = Column(Integer, ForeignKey('Post.id'))
-    user_id = Column(Integer, ForeignKey("User.id"))
+    post_id = Column(Integer, ForeignKey('post.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
     datetime = Column(DateTime(100), server_default=func.now())
     content = Column(String(128), nullable=False)
 
     def set_content(self, content):
         self.content = content
-    
-'''
-FORUM
- - POST
-    -POST ID PK
-    -USERID FK
-    -DATETIME
-    -CONTENT
-    -COMMENT relationship 
- - COMMENTS
-    - COMMENT ID PK
-    - POST ID FK
-    - USER ID FK
-    - DATETIME
-    - CONTENT
-'''
