@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_session import Session
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash
 from database.models import db, User
 from werkzeug.exceptions import Unauthorized
+from database.models import db, Wordlewords
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -67,6 +70,22 @@ def home():
         return render_template('home.html', user=current_user)
     else:
         return redirect(url_for('login'))
+
+@app.route('/wordleCreation')
+@login_required
+def wordleCreation():
+    if current_user.is_authenticated:
+        return render_template('wordleCreation.html', user=current_user)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/generate_word', methods=['GET'])
+def generate_word():
+    random_word = Wordlewords.query.order_by(func.random()).first()
+    if random_word:
+        return jsonify({'word': random_word.word})
+    else:
+        return jsonify({'error': 'No words found'})
 
 
 @app.route('/logout')

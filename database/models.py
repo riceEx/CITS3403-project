@@ -36,6 +36,10 @@ class User(UserMixin, Model):
         # We don't have anonymous users, so always return False
         return False
 
+class Wordlewords(Model):
+    id = Column(Integer, primary_key=True)
+    word = Column(String(10), nullable=False)
+
 class Post(Model):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"))
