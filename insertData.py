@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database.models import Wordlewords  # Import your Wordlewords model
+from database.models import Wordlewords  # Import Wordlewords database model
 
-# This python file purges the db to only have the bare bones of what we need in the database.
+# This python file will have the ability to purge the db to only have the bare bones of what we need in the database.
 # We should also add more 'table purges', so we don't have unnecessary data in the database.
 
 
