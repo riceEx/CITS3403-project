@@ -9,6 +9,7 @@ Flask-SQLAlchemy	3.1.1
 SQLAlchemy		2.0.29
 Flask-Session     0.8.0
 
+
 # Getting started
 run the following command
 `python ./app.py`
