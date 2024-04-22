@@ -1,11 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_session import Session
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash
 from database.models import db, User
+from werkzeug.exceptions import Unauthorized
+from database.models import db, Wordlewords
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///messages.db'
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 db.init_app(app)
 
 login_manager = LoginManager()
@@ -50,16 +57,47 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
         else:
             flash('Invalid username or password.', 'error')
 
     return render_template('login.html')
 
+@app.route('/home')
+@login_required
+def home():
+    if current_user.is_authenticated:
+        return render_template('home.html', user=current_user)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/wordleCreation')
+@login_required
+def wordleCreation():
+    if current_user.is_authenticated:
+        return render_template('wordleCreation.html', user=current_user)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/generate_word', methods=['GET'])
+def generate_word():
+    random_word = Wordlewords.query.order_by(func.random()).first()
+    if random_word:
+        return jsonify({'word': random_word.word})
+    else:
+        return jsonify({'error': 'No words found'})
+
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
+    return redirect(url_for('index'))
+
+# This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
+@app.errorhandler(Unauthorized)
+def unauthorized(error):
+    flash("You need to log in to access this page.", "error")
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
