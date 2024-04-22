@@ -59,3 +59,17 @@ class Comment(Model):
 
     def set_content(self, content):
         self.content = content
+
+class Score(Model):
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    score = Column(Integer, nullable=False, default=0)
+
+    def __init__(self, user_id, score=0):
+        self.user_id = user_id
+        self.score = score
+
+    def set_score(self, score):
+        self.score = score
+
+    def add_score(self, score):
+        self.score += score
