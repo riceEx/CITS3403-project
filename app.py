@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_session import Session
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash
-from database.models import db, User
+from database.models import Score, db, User
 from werkzeug.exceptions import Unauthorized
 from database.models import db, Wordlewords
 import random
@@ -86,7 +86,27 @@ def generate_word():
         return jsonify({'word': random_word.word})
     else:
         return jsonify({'error': 'No words found'})
+    
+# add_score, increment score to current user if existed, else create new score
+# @param user_id which user to be updated
+# @param score score to be incremented
+@app.route('/add_score', methods=['POST'])
+def add_score():
+    _user_id = request.form["user_id"]
+    _score = request.form["score"]
 
+    # fetch current score of user
+    score = db.session.execute(db.select(Score).filter_by(user_id=_user_id)).scalar_one_or_none()
+    # create score if not existed
+    if not score:    
+        score = Score(user_id=_user_id, score=int(_score))
+        db.session.add(score)
+    else:
+        score.score += int(_score)
+    db.session.commit()
+
+    flash('Score added!', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 @login_required
