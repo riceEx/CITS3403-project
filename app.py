@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_session import Session
-from sqlalchemy import func
+from flask_socketio import SocketIO
+from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
-from database.models import Score, db, User
+from database.models import db, User, Score
 from werkzeug.exceptions import Unauthorized
 from database.models import db, Wordlewords
 import random
@@ -13,6 +14,7 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///messages.db'
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
+socketio = SocketIO(app)
 db.init_app(app)
 
 login_manager = LoginManager()
@@ -108,6 +110,22 @@ def add_score():
     flash('Score added!', 'success')
     return redirect(url_for('index'))
 
+# event listener for score update
+# send top10 result to frontend when score has an update
+def after_update_listener(mapper, connection, target):
+    # state.get_history() can be used to get the history of attributes
+    # It returns a History object with three lists: added, unchanged, and deleted
+    state = db.inspect(target)
+    if state.attrs.score.history.has_changes():
+        scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(Score.score.desc()).paginate(page=1, per_page=10, error_out=False)
+        
+        result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
+        # Emit the top 10 scores
+        socketio.emit('score_update', result)
+
+# Attach the listener to the Score class, listening to 'after_update'
+event.listen(Score, 'after_update', after_update_listener)
+
 # get_scores, get scores of all users
 # @param page_no page number
 # @param page_size page size
@@ -119,10 +137,11 @@ def get_scores():
     order = request.args.get("order", 'desc')   
     order_method = getattr(Score.score, order)
 
-    scores = db.session.query(Score).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
+    scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
 
     # transform score models to list of dicts
-    result = [score.to_dict() for score in scores.items]
+    # result = [score.to_dict() for score in scores.items]
+    result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
 
     flash('Score fetched!', 'success')
     # return result as JSON
