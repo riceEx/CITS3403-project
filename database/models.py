@@ -68,6 +68,12 @@ class Score(Model):
         self.user_id = user_id
         self.score = score
 
+    def to_dict(self):
+        return {
+            'id': self.user_id,
+            'score': self.score
+        }
+
     def set_score(self, score):
         self.score = score
 

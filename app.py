@@ -108,6 +108,26 @@ def add_score():
     flash('Score added!', 'success')
     return redirect(url_for('index'))
 
+# get_scores, get scores of all users
+# @param page_no page number
+# @param page_size page size
+# @param order: asc or desc
+@app.route('/get_scores', methods=['GET'])
+def get_scores():
+    page_no = request.args.get("page_no", 1)
+    page_size = request.args.get("page_size", 10)
+    order = request.args.get("order", 'desc')   
+    order_method = getattr(Score.score, order)
+
+    scores = db.session.query(Score).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
+
+    # transform score models to list of dicts
+    result = [score.to_dict() for score in scores.items]
+
+    flash('Score fetched!', 'success')
+    # return result as JSON
+    return jsonify({"result": result, "total": scores.total})
+
 @app.route('/logout')
 @login_required
 def logout():
