@@ -117,8 +117,9 @@ def after_update_listener(mapper, connection, target):
     # It returns a History object with three lists: added, unchanged, and deleted
     state = db.inspect(target)
     if state.attrs.score.history.has_changes():
-        scores = db.session.query(Score).order_by(Score.score.desc()).paginate(page=1, per_page=10, error_out=False)
-        result = [score.to_dict() for score in scores.items]
+        scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(Score.score.desc()).paginate(page=1, per_page=10, error_out=False)
+        
+        result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
         # Emit the top 10 scores
         socketio.emit('score_update', result)
 
@@ -136,10 +137,11 @@ def get_scores():
     order = request.args.get("order", 'desc')   
     order_method = getattr(Score.score, order)
 
-    scores = db.session.query(Score).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
+    scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
 
     # transform score models to list of dicts
-    result = [score.to_dict() for score in scores.items]
+    # result = [score.to_dict() for score in scores.items]
+    result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
 
     flash('Score fetched!', 'success')
     # return result as JSON
