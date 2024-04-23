@@ -18,6 +18,7 @@
             <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
             <a href="{{ url_for('wordleCreation') }}" class="btn btn-primary">Create a Wordle Game</a>
             <button onclick="addScore()" class="btn btn-primary">add_score 5</button>
+            <button onclick="getScores()" class="btn btn-primary">getScores</button>
             {% else %}
             <p class="card-text">Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('register') }}">register</a> to continue.</p>
             {% endif %}
@@ -91,7 +92,10 @@
 
 <script>
     function addScore() {
-        $.post('/add_score', {user_id: Math.floor(Math.random() * 6) + 1, score: 5});
+        $.post('/add_score', {user_id: Math.floor(Math.random() * 100) + 1, score: 5});
+    }
+    function getScores() {
+        $.get('/get_scores', {page_no: 1, page_size: 3, order: 'asc'});
     }
 </script>
 
