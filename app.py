@@ -4,9 +4,9 @@ from flask_session import Session
 from flask_socketio import SocketIO
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
-from database.models import db, User, Score
+from database.models import db, User, Score, WordleWords
 from werkzeug.exceptions import Unauthorized
-from database.models import db, Wordlewords
+import utils
 import random
 
 app = Flask(__name__)
@@ -83,11 +83,28 @@ def wordleCreation():
 
 @app.route('/generate_word', methods=['GET'])
 def generate_word():
-    random_word = Wordlewords.query.order_by(func.random()).first()
+    random_word = WordleWords.query.order_by(func.random()).first()
     if random_word:
         return jsonify({'word': random_word.word})
     else:
         return jsonify({'error': 'No words found'})
+
+# check if given word matches with the target word, return an array of [0, 1, 2]
+# @param word user input word
+# @param wordle_id which wordle_game to refer
+# return 0 if the ith letter is not in the target word
+# return 1 in cell i if the ith letter is in the word, but in a different place
+# return 2 in cell i if the ith letter is in the word and in the right place
+@app.route('/wordle/check_word', methods=['POST'])
+def checkWord():
+    word = request.form["word"]
+    wordle_id = request.form["wordle_id"]
+    # fetch target word, if not exist, return error
+    wordle = db.session.execute(db.select(WordleWords).filter_by(id = int(wordle_id))).scalar_one_or_none()
+    if not wordle:
+        return jsonify({'error': 'No wordle found'})
+    return utils.checkWord(word, wordle.word)
+
 
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
