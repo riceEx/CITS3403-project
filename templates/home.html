@@ -34,8 +34,6 @@
     <form id="wordForm">
         <label for="wordInput">Enter a word:</label>
         <input type="text" id="wordInput" name="word">
-        <label for="wordleIdInput">Enter Wordle ID:</label>
-        <input type="text" id="wordleIdInput" name="wordle_id">
         <button type="submit">Check</button>
     </form>
     <p id="resultMessage"></p>
@@ -132,21 +130,35 @@
     socket.on("score_update", (scores) => {
         console.warn("score updated!", scores)
     });
+</script>
 
 
-    //activates when submit
+<script>   
     document.getElementById('wordForm').addEventListener('submit', function(event) {
-    
-        var word = document.getElementById('wordInput').value.trim();
-        fetch('/check_word', {
+        event.preventDefault(); // Prevent the form from submitting normally
+        // Get the word inputted by the user
+        var userword = document.getElementById('wordInput').value.trim();
+        
+
+        // Make a POST request to the Flask route for checking the word
+        fetch('/wordle/check_word', {
             method: 'POST',
-            body: new URLSearchParams({word: Userword}), 
+            body: new URLSearchParams({word: userword}), // Send the word and wordle ID as form data
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
         })
-        .then(response => response.json()) 
+        .then(response => response.json()) // Parse the JSON response
         .then(data => {
+            // Display the result message
             var resultMessage = document.getElementById('resultMessage');
-            resultMessage.textContent = data.message;
+            if (data.error) {
+                resultMessage.textContent = data.error;
+            } else {
+                resultMessage.textContent = data.result;
+            }
         })
+        .catch(error => console.error('Error:', error));
     });
 </script>
 
