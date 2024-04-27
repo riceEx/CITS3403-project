@@ -165,17 +165,6 @@ def get_scores():
     return jsonify({"result": result, "total": scores.total})
 
 
-# checking the word
-@app.route('/check_word', methods=['POST'])
-def get_worddb():
-    Userword = request.form['word'].lower() #get the word from the form
-    CWord = Wordlewords.query.filter_by(word=Userword) #compare word from wordlewords
-    if CWord:
-        return jsonify({'valid': True, 'message': 'Word is valid!'})
-    else:
-        return jsonify({'valid': False, 'message': 'Word is not valid!'})
-
-
 
 @app.route('/logout')
 @login_required
