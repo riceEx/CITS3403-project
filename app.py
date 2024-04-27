@@ -88,7 +88,7 @@ def generate_word():
         return jsonify({'word': random_word.word})
     else:
         return jsonify({'error': 'No words found'})
-    
+
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented
@@ -147,6 +147,19 @@ def get_scores():
     # return result as JSON
     return jsonify({"result": result, "total": scores.total})
 
+
+# checking the word
+@app.route('/check_word', methods=['POST'])
+def get_worddb():
+    Userword = request.form['word'].lower() #get the word from the form
+    CWord = Wordlewords.query.filter_by(word=Userword) #compare word from wordlewords
+    if CWord:
+        return jsonify({'valid': True, 'message': 'Word is valid!'})
+    else:
+        return jsonify({'valid': False, 'message': 'Word is not valid!'})
+
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -158,6 +171,7 @@ def logout():
 def unauthorized(error):
     flash("You need to log in to access this page.", "error")
     return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     with app.app_context():

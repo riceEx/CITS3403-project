@@ -9,6 +9,8 @@
 </head>
 <body>
 
+<script src="static/js/script.js"></script>
+
 <div class="container mt-5">
     <div class="card">
         <div class="card-body">
@@ -26,6 +28,15 @@
     </div>
 </div>
 
+<div>
+    <script src="static/js/script.js"></script>
+    <form id="wordForm">
+        <label for="wordInput">Enter a 5 letter word:</label> <input id="wordInput" name="word">
+        <button type="submit">Check</button>
+    </form>
+    <p id="resultMessage"></p>
+
+</div>
 
 
 <!--div for leaderboard-->
@@ -90,6 +101,12 @@
 </div>
 
 
+
+
+
+
+
+
 <script>
     function addScore() {
         $.post('/add_score', {user_id: Math.floor(Math.random() * 100) + 1, score: 5});
@@ -107,6 +124,22 @@
     });
     socket.on("score_update", (scores) => {
         console.warn("score updated!", scores)
+    });
+
+
+    //activates when submit
+    document.getElementById('wordForm').addEventListener('submit', function(event) {
+    
+        var word = document.getElementById('wordInput').value.trim();
+        fetch('/check_word', {
+            method: 'POST',
+            body: new URLSearchParams({word: Userword}), 
+        })
+        .then(response => response.json()) 
+        .then(data => {
+            var resultMessage = document.getElementById('resultMessage');
+            resultMessage.textContent = data.message;
+        })
     });
 </script>
 

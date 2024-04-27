@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     // Function to send message using AJAX
     $('#messageForm').submit(function(event) {
@@ -27,3 +28,12 @@ $(document).ready(function() {
         $('#messages').append('<p>' + message.content + '</p>');
     };
 });
+
+
+
+
+
+
+
+
+
