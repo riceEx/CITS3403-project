@@ -19,6 +19,7 @@
             <a href="{{ url_for('wordleCreation') }}" class="btn btn-primary">Create a Wordle Game</a>
             <button onclick="addScore()" class="btn btn-primary">add_score 5</button>
             <button onclick="getScores()" class="btn btn-primary">getScores</button>
+            <button onclick="checkRandomWord()" class="btn btn-primary">check_Random_Word(apple)</button>
             {% else %}
             <p class="card-text">Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('register') }}">register</a> to continue.</p>
             {% endif %}
@@ -96,6 +97,10 @@
     }
     function getScores() {
         $.get('/get_scores', {page_no: 1, page_size: 3, order: 'asc'});
+    }
+    function checkRandomWord() {
+        randomWord = 'apple'.split('').sort(()=>Math.random()-.5).join('');
+        $.post('wordle/check_word', {word: randomWord, wordle_id: 1});
     }
 </script>
 
