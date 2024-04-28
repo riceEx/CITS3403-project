@@ -17,6 +17,7 @@
             <h2 class="card-title">Welcome to Your App!</h2>
             {% if current_user.is_authenticated %}
             <p class="card-text">Hello, {{ current_user.username }}! You are logged in.</p>
+            <a href="{{ url_for('forum') }}" class="btn btn-primary">Go to forum Page</a>
             <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
             <a href="{{ url_for('wordleCreation') }}" class="btn btn-primary">Create a Wordle Game</a>
             <button onclick="addScore()" class="btn btn-primary">add_score 5</button>

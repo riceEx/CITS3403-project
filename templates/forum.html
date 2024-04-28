@@ -9,9 +9,20 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Forum Discussions</h1>
-    <p>Welcome to the forum! Feel free to post your questions and discuss with others.</p>
-    
+    <h1>POST YOUR WORDLE GAME!!!</h1>
+    <div>
+        <div>
+            <h2 class="card-title">Welcome to Your App!</h2>
+            {% if current_user.is_authenticated %}
+            <p class="card-text">Hello, Welcome to the forum, {{ current_user.username }}! Feel free to post your questions and discuss with others.</p>
+            <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Return Home</a>
+            <a href="{{ url_for('wordleCreation') }}" class="btn btn-primary">Create a Wordle Game</a>
+            {% else %}
+            <p class="card-text">Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('register') }}">register</a> to continue.</p>
+            {% endif %}
+        </div>
+    </div>
     <div>
         <input type="text" id="newPostContent" placeholder="Enter new post content">
         <input type="text" id="newPostHint" placeholder="Enter a hint">

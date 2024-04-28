@@ -73,6 +73,14 @@ def home():
     else:
         return redirect(url_for('login'))
 
+@app.route('/forum')
+@login_required
+def forum():
+    if current_user.is_authenticated:
+        return render_template('forum.html', user=current_user)
+    else:
+        return redirect(url_for('login'))
+    
 @app.route('/wordleCreation')
 @login_required
 def wordleCreation():
