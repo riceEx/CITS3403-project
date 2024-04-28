@@ -88,8 +88,64 @@
 
 
 
+<<<<<<< Updated upstream
 
 
+=======
+<script>
+    function addScore() {
+        $.post('/add_score', {user_id: Math.floor(Math.random() * 100) + 1, score: 5});
+    }
+    function getScores() {
+        $.get('/get_scores', {page_no: 1, page_size: 3, order: 'asc'});
+    }
+    function checkRandomWord() {
+        randomWord = 'apple'.split('').sort(()=>Math.random()-.5).join('');
+        $.post('wordle/check_word', {word: randomWord, wordle_id: 1});
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        //
+    });
+    socket.on("score_update", (scores) => {
+        console.warn("score updated!", scores)
+    });
+</script>
+
+
+<script>   
+    document.getElementById('wordForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+        // Get the word inputted by the user
+        var userword = document.getElementById('wordInput').value.trim();
+
+        // Make a POST request to the Flask route for checking the word
+        fetch('/checkWord', {
+            method: 'POST',
+            body: new URLSearchParams({word: userword}), // Send the word as form data
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => response.json()) // Parse the JSON response
+        .then(data => {
+            // Display the result message
+            var resultMessage = document.getElementById('resultMessage');
+            if (data.error) {
+                resultMessage.textContent = data.error;
+            } else {
+                resultMessage.textContent = data.result;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
+>>>>>>> Stashed changes
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </body>
 </html>
