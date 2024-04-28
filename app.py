@@ -106,6 +106,22 @@ def checkWord():
     return utils.checkWord(word, wordle.word)
 
 
+# check if given word matches with the target word
+# @param word user input Uword
+# return with Word is valid and declare valid as True
+# return with Word is not valid and declare valid as False
+@app.route('/ValidateWord', methods=['POST'])
+def ValidateWord():
+    Userword = request.form["Postword"]
+    # fetch target word, if not exist, return error
+    wordle = db.session.execute(db.select(Wordlewords).filter_by(Userword))
+     # Check if the word exists
+    if wordle:
+        return jsonify({'message': 'Word is valid!', 'valid': True})
+    else:
+        return jsonify({ 'message': 'Word is not valid!','valid': False})
+
+
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented

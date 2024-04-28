@@ -28,12 +28,3 @@ $(document).ready(function() {
         $('#messages').append('<p>' + message.content + '</p>');
     };
 });
-
-
-
-
-
-
-
-
-

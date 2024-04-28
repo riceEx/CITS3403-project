@@ -36,7 +36,7 @@
         <input type="text" id="wordInput" name="word">
         <button type="submit">Check</button>
     </form>
-    <p id="resultMessage"></p>
+    <p id ="resultMessage"></p>
 </div>
 
 
@@ -106,7 +106,18 @@
 
 
 
+<script>
+    document.getElementById('ValidatewordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        ValidateData();
+    });
 
+    function ValidateData() {
+        var Word = document.getElementById('wordInput').value;
+        var outputWord = document.getElementById('resultMessage');
+        outputWord.innerHTML = "the word is: " + Word ;
+    }
+</script>
 
 <script>
     function addScore() {
@@ -134,16 +145,14 @@
 
 
 <script>   
-    document.getElementById('wordForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the form from submitting normally
+    document.getElementById('ValidatewordForm').addEventListener('submit', function(event) {
         // Get the word inputted by the user
         var userword = document.getElementById('wordInput').value.trim();
-        
 
         // Make a POST request to the Flask route for checking the word
-        fetch('/wordle/check_word', {
+        fetch('/ValidateWord', {
             method: 'POST',
-            body: new URLSearchParams({word: userword}), // Send the word and wordle ID as form data
+            body: new URLSearchParams({word: userword}), // Send the word as form data
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
