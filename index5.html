@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Forum</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Forum Discussions</h1>
+    <p>Welcome to the forum! Feel free to post your questions and discuss with others.</p>
+    
+    <div>
+        <input type="text" id="newPostContent" placeholder="Enter new post content">
+        <input type="text" id="newPostHint" placeholder="Enter a hint">
+        <select id="postLanguage">
+            <option value="English">English</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Russian">Russian</option>
+            <option value="Filipino">Filipino</option>
+            <option value="Japanese">Japanese</option>
+        </select>
+        <button onclick="addPost()">Add Post</button>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-button" onclick="showTab('active')">Active Posts</button>
+        <button class="tab-button" onclick="showTab('completed')">Completed Posts</button>
+    </div>
+
+    <select id="filterLanguage" onchange="updatePostsView()">
+        <option value="all">All Languages</option>
+        <option value="English">English</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Russian">Russian</option>
+        <option value="Filipino">Filipino</option>
+        <option value="Japanese">Japanese</option>
+    </select>
+    <select id="sortOption" onchange="updatePostsView()">
+        <option value="recent">Sort by Recent</option>
+        <option value="clicks">Sort by Clicks</option>
+        <option value="random">Sort Randomly</option>
+    </select>
+
+    <div id="postsContainer">
+        <h2>Active Posts</h2>
+    </div>
+    <div id="completedPostsContainer" style="display:none;">
+        <h2>Completed Posts</h2>
+    </div>
+</div>
+
+<script>
+let posts = JSON.parse(localStorage.getItem('posts')) || [];
+
+function addPost() {
+    const content = document.getElementById('newPostContent').value;
+    const hint = document.getElementById('newPostHint').value;
+    const languageSelect = document.getElementById('postLanguage');
+    const language = languageSelect.options[languageSelect.selectedIndex].value;
+
+    if (!content) {
+        alert('Please enter some content to add a post.');
+        return;
+    }
+
+    const newPost = {
+        id: String(posts.length + 1),
+        content: content,
+        hint: hint,
+        language: language,
+        clicks: 0,
+        attempts: 4,
+        timestamp: new Date(),
+        status: 'active'
+    };
+
+    posts.push(newPost);
+    savePosts();
+    updatePostsView();
+    document.getElementById('newPostContent').value = '';
+    document.getElementById('newPostHint').value = '';
+}
+
+function updatePostsView() {
+    const currentTab = document.querySelector('.tab-button.active').textContent.includes('Active') ? 'active' : 'completed';
+    const selectedLanguage = document.getElementById('filterLanguage').value;
+    const sortOption = document.getElementById('sortOption').value;
+    renderPosts(currentTab, selectedLanguage, sortOption);
+}
+
+function renderPosts(status, filterLanguage, sortOption) {
+    const container = document.getElementById(status === 'active' ? 'postsContainer' : 'completedPostsContainer');
+    container.innerHTML = `<h2>${status.charAt(0).toUpperCase() + status.slice(1)} Posts</h2>`;
+    let filteredPosts = posts.filter(post => post.status === status && (filterLanguage === 'all' || post.language === filterLanguage));
+
+    switch (sortOption) {
+        case 'recent':
+            filteredPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            break;
+        case 'clicks':
+            filteredPosts.sort((a, b) => b.clicks - a.clicks);
+            break;
+        case 'random':
+            filteredPosts.sort(() => 0.5 - Math.random());
+            break;
+    }
+
+    filteredPosts.forEach(post => {
+        const elapsedTime = getElapsedTime(post.timestamp);
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+            <div>
+                <h3 class="hint" onclick="toggleDropdownMenu('${post.id}')">${post.hint}</h3>
+                <div id="dropdown_${post.id}" class="dropdown-content" style="display: none;">
+                    <p>${post.content} (${post.language}) - <small>${elapsedTime}</small></p>
+                    <span id="clicks_${post.id}">Clicks: ${post.clicks}</span>
+                    <a class="dropdown-item" href="#" onclick="editPost('${post.id}'); event.stopPropagation();">Edit</a>
+                    <a class="dropdown-item" href="#" onclick="deletePost('${post.id}'); event.stopPropagation();">Delete</a>
+                    <a class="dropdown-item" href="#" onclick="incrementClickCount('${post.id}'); event.stopPropagation();">Increment Click Count</a>
+                    <input type="text" id="input_${post.id}" placeholder="Enter content here" ${post.attempts === 0 ? 'disabled' : ''} style="border-color: ${post.attempts === 0 ? 'red' : 'initial'};">
+                    <button id="checkButton_${post.id}" onclick="checkInput('${post.id}'); event.stopPropagation();">Check</button>
+                    <a class="dropdown-item" href="#" onclick="inputChecking('${post.id}'); event.stopPropagation();">Input Checking</a>
+                </div>
+            </div>delete
+        `;
+        container.appendChild(postElement);
+    });
+}
+
+function toggleDropdownMenu(postId) {
+    const dropdownMenu = document.getElementById(`dropdown_${postId}`);
+    dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleHint(postId) {
+    const hintElement = document.getElementById(`hint_${postId}`);
+    if (hintElement.style.display === 'none') {
+        hintElement.style.display = 'block';
+        incrementClickCount(postId); // Increment click count when showing hint
+    } else {
+        hintElement.style.display = 'none';
+    }
+}
+
+function incrementClickCount(postId) {
+    const post = posts.find(p => p.id === postId);
+    if (post.clicks === 0) {
+        post.clicks = 1;
+    } else {
+        post.clicks += 0.5;
+    }
+    document.getElementById(`clicks_${postId}`).textContent = `Clicks: ${post.clicks}`;
+    savePosts();
+    updatePostsView();
+}
+
+function deletePost(postId) {
+    posts = posts.filter(p => p.id !== postId);
+    savePosts();
+    updatePostsView();
+}
+
+function editPost(postId) {
+    const post = posts.find(p => p.id === postId);
+    const newContent = prompt('Enter the new content for the post:', post.content);
+    if (newContent !== null) {
+        post.content = newContent;
+        savePosts();
+        updatePostsView();
+    }
+}
+
+function checkInput(postId) {
+    const post = posts.find(p => p.id === postId);
+    const input = document.getElementById(`input_${postId}`).value;
+    if (input.trim() === post.content) {
+        post.status = 'completed';
+        savePosts();
+        showTab('completed');  // Switch to the completed tab
+        updatePostsView();  // Now updatePostsView will be based on 'completed' tab
+    } else {
+        post.attempts--;
+        document.getElementById(`input_${postId}`).disabled = post.attempts === 0;
+        document.getElementById(`input_${postId}`).style.borderColor = post.attempts === 0 ? 'red' : 'initial';
+        updatePostsView();
+    }
+}
+
+function inputChecking(postId) {
+    const post = posts.find(p => p.id === postId);
+    const inputValue = prompt('Enter input to check:');
+    if (inputValue === post.content) {
+        post.status = 'completed'; // Move to completed posts
+        savePosts();
+    } else {
+        post.attempts--;
+        if (post.attempts === 0) {
+            const hintElement = document.getElementById(`hint_${postId}`);
+            hintElement.innerHTML += '<br><input type="checkbox" style="background-color: red;" disabled>';
+        }
+        savePosts();
+    }
+    updatePostsView();
+}
+
+function showTab(status) {
+    const activeContainer = document.getElementById('postsContainer');
+    const completedContainer = document.getElementById('completedPostsContainer');
+    const activeBtn = document.querySelector('.tab-button:first-child');
+    const completedBtn = document.querySelector('.tab-button:last-child');
+
+    if (status === 'active') {
+        activeContainer.style.display = 'block';
+        completedContainer.style.display = 'none';
+        activeBtn.classList.add('active');
+        completedBtn.classList.remove('active');
+    } else {
+        completedContainer.style.display = 'block';
+        activeContainer.style.display = 'none';
+        completedBtn.classList.add('active');
+        activeBtn.classList.remove('active');
+    }
+    updatePostsView(); // Render posts based on the selected tab and filter
+}
+
+function getElapsedTime(timestamp) {
+    const now = new Date();
+    const elapsed = now - new Date(timestamp);
+    const minutes = Math.floor(elapsed / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    if (days > 0) return `${days} days ago`;
+    if (hours > 0) return `${hours} hours ago`;
+    if (minutes > 0) return `${minutes} minutes ago`;
+    return 'Just now';
+}
+
+function savePosts() {
+    localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    showTab('active'); // Initially show active posts
+});
+</script>
+
+
+
+</body>
+</html>

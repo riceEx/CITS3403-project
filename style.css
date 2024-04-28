@@ -1,0 +1,85 @@
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+input, select {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 50%; /* Make the buttons round */
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Increase spacing between boxes */
+.post, .container, .tabs {
+    margin-bottom: 20px; /* Adjust this value as needed to increase spacing */
+}
+
+/* Increase border size and darken the border color */
+.post, .tabs button {
+    border: 3px solid #333; /* Increased border size and darker color */
+}
+
+/* If you have a border around the container */
+.container {
+    border: 3px solid #333; /* Increase border size for larger containers */
+    padding: 20px; /* Add more padding if needed */
+}
+
+/* Darken colors and possibly adjust font colors for better contrast */
+body {
+    background-color: #f0f0f0; /* Darker shade of grey or your choice */
+    color: #333; /* Darker text color for better readability */
+}
+
+/* Styling for active tab and button hover effects */
+.tab-button.active, .tab-button:hover {
+    background-color: #666; /* Darker background color for active/hover state */
+    color: white;
+}
+
+/* Darker dropdown menus for consistency */
+.dropdown-content {
+    background-color: #ccc; /* Slightly darker background for dropdown */
+}
+
+/* Optional: If you have inputs and want to make their borders darker */
+input[type="text"], select {
+    border: 2px solid #666; /* Darker and thicker borders for inputs */
+}
