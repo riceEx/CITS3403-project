@@ -87,8 +87,6 @@ def generate_word():
     else:
         return jsonify({'error': 'No words found'})
 
-<<<<<<< Updated upstream
-=======
 # check if given word matches with the target word, return an array of [0, 1, 2]
 # @param word user input word
 # @param wordle_id which wordle_game to refer
@@ -100,7 +98,7 @@ def checkWord():
     word = request.form["word"]
     wordle_id = request.form["wordle_id"]
     # fetch target word, if not exist, return error
-    wordle = db.session.execute(db.select(WordleWords).filter_by(id = int(wordle_id))).scalar_one_or_none()
+    wordle = db.session.execute(db.select(Wordlewords).filter_by(id = int(wordle_id))).scalar_one_or_none()
     if not wordle:
         return jsonify({'error': 'No wordle found'})
     return utils.checkWord(word, wordle.word)
@@ -109,11 +107,11 @@ def checkWord():
 # @param word user input Uword
 # return with Word is valid and declare valid as True
 # return with Word is not valid and declare valid as False
-@app.route('/checkWord', methods=['POST'])
-def checkWord():
-    word = request.form["word"]
+@app.route('/ValidateWord', methods=['POST'])
+def ValidateWord():
+    Userword = request.form["Postword"]
     # fetch target word, if not exist, return error
-    wordle = db.session.execute(db.select(WordleWords).filter_by(word))
+    wordle = db.session.execute(db.select(Wordlewords).filter_by(Userword))
      # Check if the word exists
     if wordle:
         return jsonify({'message': 'Word is valid!', 'valid': True})
@@ -156,7 +154,7 @@ def after_update_listener(mapper, connection, target):
         socketio.emit('score_update', result)
 
 # Attach the listener to the Score class, listening to 'after_update'
-event.listen(Score, 'after_update', after_update_listener)
+#event.listen(Score, 'after_update', after_update_listener)
 
 # get_scores, get scores of all users
 # @param page_no page number
@@ -180,7 +178,6 @@ def get_scores():
     return jsonify({"result": result, "total": scores.total})
 
 
->>>>>>> Stashed changes
 
 @app.route('/logout')
 @login_required
