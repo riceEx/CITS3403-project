@@ -6,6 +6,7 @@ from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
 from database.models import db, User, Score, WordleWords
 from werkzeug.exceptions import Unauthorized
+import sqlite3
 import utils
 import random
 
@@ -114,21 +115,21 @@ def checkWord():
     return utils.checkWord(word, wordle.word)
 
 
-# check if given word matches with the target word
-# @param word user input Uword
-# return with Word is valid and declare valid as True
-# return with Word is not valid and declare valid as False
-@app.route('/ValidateWord', methods=['POST'])
-def ValidateWord():
-    Userword = request.form["Postword"]
-    # fetch target word, if not exist, return error
-    wordle = db.session.execute(db.select(Wordlewords).filter_by(Userword))
-     # Check if the word exists
-    if wordle:
-        return jsonify({'message': 'Word is valid!', 'valid': True})
-    else:
-        return jsonify({ 'message': 'Word is not valid!','valid': False})
 
+    
+#Function to fetch words from the database
+def get_words_from_db():
+    conn = sqlite3.connect('instance/messages.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT word FROM wordle_words')
+    words = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return words
+
+@app.route('/words', methods=['GET'])
+def get_words():
+    words = get_words_from_db()
+    return jsonify({'words': words})
 
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated

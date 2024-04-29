@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database.models import Wordlewords  # Import Wordlewords database model
+from database.models import WordleWords  # Import Wordlewords database model
 
 # This python file will have the ability to purge the db to only have the bare bones of what we need in the database.
 # We should also add more 'table purges', so we don't have unnecessary data in the database.
@@ -11,7 +11,7 @@ Session = sessionmaker(bind=engine)
 
 # Clear existing data from the Wordlewords table
 with Session() as session:
-    session.query(Wordlewords).delete()
+    session.query(WordleWords).delete()
     session.commit()
 
 # Read the text file
@@ -21,6 +21,6 @@ with open('data\\wordleValidWords.txt', 'r') as file:
 # Insert each word into the table
 with Session() as session:
     for word in words:
-        new_word = Wordlewords(word=word)
+        new_word = WordleWords(word=word)
         session.add(new_word)
     session.commit()

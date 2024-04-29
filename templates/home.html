@@ -34,10 +34,12 @@
     <h1>Check Word</h1>
     <form id="wordForm">
         <label for="wordInput">Enter a word:</label>
-        <input type="text" id="wordInput" name="word">
-        <button type="submit">Check</button>
+        <input type="text" id="wordInput" placeholder="Enter a word">
+        <button type="submit">Display Word</button>
+        <button onclick="checkWord()">Check</button>
     </form>
     <p id ="resultMessage"></p>
+    <p id="result"></p>
 </div>
 
 
@@ -104,13 +106,11 @@
 
 
 
-
-
-
 <script>
-    document.getElementById('ValidatewordForm').addEventListener('submit', function(event) {
+    document.getElementById('wordForm').addEventListener('submit', function(event) {
         event.preventDefault();
         ValidateData();
+        checkWord();
     });
 
     function ValidateData() {
@@ -118,6 +118,38 @@
         var outputWord = document.getElementById('resultMessage');
         outputWord.innerHTML = "the word is: " + Word ;
     }
+
+    function fetchWordsFromServer() {
+        // Send a GET request to the Flask server to fetch words
+        fetch('/words')
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response containing the words
+                const words = data.words;
+                // Use the words as needed
+                console.log('Words from the server:', words);
+                // Store the words for later comparison
+                window.wordsFromServer = words;
+            })
+            .catch(error => {
+                // Handle any errors that occur during the request
+                console.error('Error fetching words:', error);
+            });
+        }
+
+        function checkWord() {
+            const wordInput = document.getElementById('wordInput').value.trim();
+            const wordsFromServer = window.wordsFromServer || []; // Get words from server response
+
+            if (wordsFromServer.includes(wordInput)) {
+                document.getElementById('result').innerText = 'The word exists in the database.';
+            } else {
+                document.getElementById('result').innerText = 'The word does not exist in the database.';
+            }
+        }
+
+        // Call the function to fetch words when the page loads
+        fetchWordsFromServer();
 </script>
 
 <script>
@@ -145,32 +177,7 @@
 </script>
 
 
-<script>   
-    document.getElementById('ValidatewordForm').addEventListener('submit', function(event) {
-        // Get the word inputted by the user
-        var userword = document.getElementById('wordInput').value.trim();
 
-        // Make a POST request to the Flask route for checking the word
-        fetch('/ValidateWord', {
-            method: 'POST',
-            body: new URLSearchParams({word: userword}), // Send the word as form data
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-        .then(response => response.json()) // Parse the JSON response
-        .then(data => {
-            // Display the result message
-            var resultMessage = document.getElementById('resultMessage');
-            if (data.error) {
-                resultMessage.textContent = data.error;
-            } else {
-                resultMessage.textContent = data.result;
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-</script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </body>
