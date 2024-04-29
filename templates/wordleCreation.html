@@ -20,6 +20,7 @@
             <h2 class="card-title">Create a Wordle!</h2>
             {% if current_user.is_authenticated %}
             <p class="card-text">Hello, {{ current_user.username }}! Let's create a Wordle.</p>
+            <a href="{{ url_for('forum') }}" class="btn btn-primary">Go to forum Page</a>
             <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
             <a href="{{ url_for('home') }}" class="btn btn-primary">Return Home</a>
             {% else %}
