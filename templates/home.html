@@ -35,12 +35,13 @@
     <form id="wordForm">
         <label for="wordInput">Enter a word:</label>
         <input type="text" id="wordInput" placeholder="Enter a word">
-        <button type="submit">Display Word</button>
-        <button onclick="checkWord()">Check</button>
+        <button type="button" onclick="displayWord()">Display Word</button>
+        <button type="button" onclick="checkWord()">Check</button>
     </form>
     <p id ="resultMessage"></p>
     <p id="result"></p>
 </div>
+
 
 
 <!--div for leaderboard-->
@@ -104,53 +105,35 @@
     </table>
 </div>
 
-
-
 <script>
-    document.getElementById('wordForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        ValidateData();
-        checkWord();
-    });
-
-    function ValidateData() {
-        var Word = document.getElementById('wordInput').value;
-        var outputWord = document.getElementById('resultMessage');
-        outputWord.innerHTML = "the word is: " + Word ;
+    function displayWord() {
+        var wordInput = document.getElementById("wordInput").value;
+        document.getElementById("result").innerHTML = "Word: " + wordInput;
     }
 
-    function fetchWordsFromServer() {
-        // Send a GET request to the Flask server to fetch words
-        fetch('/words')
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response containing the words
-                const words = data.words;
-                // Use the words as needed
-                console.log('Words from the server:', words);
-                // Store the words for later comparison
-                window.wordsFromServer = words;
-            })
-            .catch(error => {
-                // Handle any errors that occur during the request
-                console.error('Error fetching words:', error);
-            });
-        }
+    function checkWord() {
+        var wordInput = document.getElementById("wordInput").value;
 
-        function checkWord() {
-            const wordInput = document.getElementById('wordInput').value.trim();
-            const wordsFromServer = window.wordsFromServer || []; // Get words from server response
-
-            if (wordsFromServer.includes(wordInput)) {
-                document.getElementById('result').innerText = 'The word exists in the database.';
-            } else {
-                document.getElementById('result').innerText = 'The word does not exist in the database.';
+        $.ajax({
+            url: '/check_user_given_word',
+            type: 'POST',
+            data: { word: wordInput },
+            success: function(response) {
+                if (response.exists) {
+                    document.getElementById("resultMessage").innerHTML = "Word exists in database.";
+                } else {
+                    document.getElementById("resultMessage").innerHTML = "Word does not exist in database.";
+                }
+            },
+            error: function(xhr, status, error) {
+                document.getElementById("resultMessage").innerHTML = "Error checking word.";
             }
-        }
-
-        // Call the function to fetch words when the page loads
-        fetchWordsFromServer();
+        });
+    }
 </script>
+
+
+
 
 <script>
     function addScore() {

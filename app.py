@@ -4,7 +4,7 @@ from flask_session import Session
 from flask_socketio import SocketIO
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
-from database.models import db, User, Score, WordleWords
+from database.models import db, User, Score, Wordlewords
 from werkzeug.exceptions import Unauthorized
 import sqlite3
 import utils
@@ -81,7 +81,9 @@ def forum():
         return render_template('forum.html', user=current_user)
     else:
         return redirect(url_for('login'))
-    
+
+
+# Wordle Creation page
 @app.route('/wordleCreation')
 @login_required
 def wordleCreation():
@@ -90,13 +92,26 @@ def wordleCreation():
     else:
         return redirect(url_for('login'))
 
+# On the Wordle Creation Page, Users can use this method to generate a random word for their wordle game.
 @app.route('/generate_word', methods=['GET'])
+@login_required
 def generate_word():
-    random_word = WordleWords.query.order_by(func.random()).first()
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'error': 'Unauthorized'}), 403
+    random_word = Wordlewords.query.order_by(func.random()).first()
     if random_word:
         return jsonify({'word': random_word.word})
     else:
         return jsonify({'error': 'No words found'})
+
+# On the Wordle Creation Page, Users can use this method to validate their word is in the database of allowed words to create a wordle game.
+@app.route('/check_user_given_word', methods=['POST'])
+def check_user_given_word():
+    word_input = request.form['word']
+    word_exists = Wordlewords.query.filter_by(word=word_input).first() is not None
+    return jsonify({'exists': word_exists})
+
+
 
 # check if given word matches with the target word, return an array of [0, 1, 2]
 # @param word user input word
@@ -105,36 +120,22 @@ def generate_word():
 # return 1 in cell i if the ith letter is in the word, but in a different place
 # return 2 in cell i if the ith letter is in the word and in the right place
 @app.route('/wordle/check_word', methods=['POST'])
+@login_required
 def checkWord():
     word = request.form["word"]
     wordle_id = request.form["wordle_id"]
     # fetch target word, if not exist, return error
-    wordle = db.session.execute(db.select(WordleWords).filter_by(id = int(wordle_id))).scalar_one_or_none()
+    wordle = db.session.execute(db.select(Wordlewords).filter_by(id = int(wordle_id))).scalar_one_or_none()
     if not wordle:
         return jsonify({'error': 'No wordle found'})
     return utils.checkWord(word, wordle.word)
 
-
-
     
-#Function to fetch words from the database
-def get_words_from_db():
-    conn = sqlite3.connect('instance/messages.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT word FROM wordle_words')
-    words = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return words
-
-@app.route('/words', methods=['GET'])
-def get_words():
-    words = get_words_from_db()
-    return jsonify({'words': words})
-
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented
 @app.route('/add_score', methods=['POST'])
+@login_required
 def add_score():
     _user_id = request.form["user_id"]
     _score = request.form["score"]
@@ -173,7 +174,10 @@ event.listen(Score, 'after_update', after_update_listener)
 # @param page_size page size
 # @param order: asc or desc
 @app.route('/get_scores', methods=['GET'])
+@login_required
 def get_scores():
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'error': 'Unauthorized'}), 403
     page_no = request.args.get("page_no", 1)
     page_size = request.args.get("page_size", 10)
     order = request.args.get("order", 'desc')   

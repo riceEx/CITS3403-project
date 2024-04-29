@@ -35,17 +35,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="static/js/script.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#generateWordButton').click(function() {
-            $.ajax({url: '/generate_word', type: 'GET', success: function(response) {
-                $('#randomWordResult').html("Random Word: " + response.word);
-                $('#randomWordResult').append('<br><button id="goodWordButton" class="btn btn-primary">Like</button>');
-            }});
+    $('#generateWordButton').click(function() {
+        $.ajax({
+            url: '/generate_word',
+            type: 'GET',
+            success: function(response) {
+                if ('word' in response) {
+                    $('#randomWordResult').html("Random Word: " + response.word);
+                    $('#randomWordResult').append('<br><button id="goodWordButton" class="btn btn-primary">Like</button>');
+                } else {
+                    $('#randomWordResult').html("No words found");
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#randomWordResult').html("Error fetching random word");
+            }
         });
-    
-        $(document).on('click', '#goodWordButton', function() {
-            alert("You liked the word!");
-        });
+    });
+
+    $(document).on('click', '#goodWordButton', function() {
+        alert("You liked the word!");
     });
 </script>
 </body>
