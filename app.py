@@ -81,7 +81,9 @@ def forum():
         return render_template('forum.html', user=current_user)
     else:
         return redirect(url_for('login'))
-    
+
+
+# Wordle Creation page
 @app.route('/wordleCreation')
 @login_required
 def wordleCreation():
@@ -90,6 +92,7 @@ def wordleCreation():
     else:
         return redirect(url_for('login'))
 
+# On the Wordle Creation Page, Users can use this method to generate a random word for their wordle game.
 @app.route('/generate_word', methods=['GET'])
 @login_required
 def generate_word():
@@ -100,6 +103,15 @@ def generate_word():
         return jsonify({'word': random_word.word})
     else:
         return jsonify({'error': 'No words found'})
+
+# On the Wordle Creation Page, Users can use this method to validate their word is in the database of allowed words to create a wordle game.
+@app.route('/check_user_given_word', methods=['POST'])
+def check_user_given_word():
+    word_input = request.form['word']
+    word_exists = Wordlewords.query.filter_by(word=word_input).first() is not None
+    return jsonify({'exists': word_exists})
+
+
 
 # check if given word matches with the target word, return an array of [0, 1, 2]
 # @param word user input word
@@ -118,26 +130,7 @@ def checkWord():
         return jsonify({'error': 'No wordle found'})
     return utils.checkWord(word, wordle.word)
 
-
-
     
-#Function to fetch words from the database
-def get_words_from_db():
-    conn = sqlite3.connect('instance/messages.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT word FROM wordlewords')
-    words = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return words
-
-@app.route('/words', methods=['GET'])
-@login_required
-def get_words():
-    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({'error': 'Unauthorized'}), 403
-    words = get_words_from_db()
-    return jsonify({'words': words})
-
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented
