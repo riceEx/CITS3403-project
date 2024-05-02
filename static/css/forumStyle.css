@@ -1,85 +1,194 @@
-.post {
+/* Basic reset and global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fafafa;
+    color: #424242;
+    padding: 20px;
+}
+
+/* Container layout */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Filter section styling */
+.filters {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+    background-color: #e3f2fd;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Posts container layout using Grid */
+.posts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    justify-content: center;
+}
+
+/* Individual post container adjustments */
+.post-container {
+    width: 700px;
+    height: 700px; /* Set a fixed height for each post */
+    background-color: #ffffff;
+    padding: 20px;
+    border: 2px solid #006400; /* Dark green border */
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.post-container:hover {
+    transform: translateY(-5px);
+    border-color: #008000; /* Slightly lighter green on hover */
+}
+
+/* Hint styling centered */
+.hint {
+    width: 100%;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* Like container for like button and counters */
+.like-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px; /* Space below like container */
+}
+
+/* Like button styling */
+.like-button {
+    background-color: #1e88e5;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px; /* Space between the like button and like counter */
+}
+
+/* Like count styling */
+.like-count {
+    background-color: #1e88e5;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px; /* Space between the like button and like counter */
+}
+
+.like-button:hover {
+    background-color: #1565c0;
+}
+
+/* View button and time posted in the same container, aligned with like button */
+.view-time-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between the view button and time posted */
+}
+
+.view-button {
+    background-color: #1e88e5;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-button:hover {
+    background-color: #1565c0;
+}
+
+.time-posted {
+    font-weight: bold;
+    margin-top: 10px;
+    align-self: center;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 800px) {
+    .post-container {
+        width: 100%;
+    }
+
+    .container, .posts-container {
+        flex-direction: column;
+    }
+
+    .filters, .post-container {
+        padding: 10px;
+    }
+}
+
+.wrong-attempts {
+    display: inline-block;
+    background-color: #ffdddd; /* Light red background */
+    color: #d00; /* Dark red text */
+    padding: 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+    width: 50px; /* Ensuring a constant square size */
+    height: 50px;
+    text-align: center;
+    line-height: 30px; /* Aligning text vertically in the middle */
+}
+
+/* Sidebar styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 100%;
+    background-color: #FFB6C1; /* Baby pink background maintained */
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    transition: width 0.3s ease-in-out;
+}
+
+#sortablePhotoList li {
     border: 1px solid #ccc;
     padding: 10px;
-    margin: 10px 0;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 8px 12px;
     margin: 5px;
-    border-radius: 5px;
-    cursor: pointer;
+    background-color: #f9f9f9;
+    cursor: grab;
+}
+#sortablePhotoList li:hover {
+    background-color: #e3e3e3;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-input, select {
-    padding: 8px;
-    margin: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-h1, h2 {
-    color: #333;
-}
-
-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    margin: 5px;
-    border-radius: 50%; /* Make the buttons round */
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Increase spacing between boxes */
-.post, .container, .tabs {
-    margin-bottom: 20px; /* Adjust this value as needed to increase spacing */
-}
-
-/* Increase border size and darken the border color */
-.post, .tabs button {
-    border: 3px solid #333; /* Increased border size and darker color */
-}
-
-/* If you have a border around the container */
-.container {
-    border: 3px solid #333; /* Increase border size for larger containers */
-    padding: 20px; /* Add more padding if needed */
-}
-
-/* Darken colors and possibly adjust font colors for better contrast */
-body {
-    background-color: #f0f0f0; /* Darker shade of grey or your choice */
-    color: #333; /* Darker text color for better readability */
-}
-
-/* Styling for active tab and button hover effects */
-.tab-button.active, .tab-button:hover {
-    background-color: #666; /* Darker background color for active/hover state */
-    color: white;
-}
-
-/* Darker dropdown menus for consistency */
-.dropdown-content {
-    background-color: #ccc; /* Slightly darker background for dropdown */
-}
-
-/* Optional: If you have inputs and want to make their borders darker */
-input[type="text"], select {
-    border: 2px solid #666; /* Darker and thicker borders for inputs */
-}
