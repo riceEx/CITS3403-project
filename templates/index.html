@@ -77,8 +77,9 @@
         {% endif %}
     </div>
 
-
-    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">Filters</div>
+    
+            
+    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
     <div class="filters-container" id="filtersContainer">
         <h3>Filters</h3>
         <label for="exactWordLengthFilter">Word Length:</label>
