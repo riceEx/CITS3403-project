@@ -21,41 +21,55 @@ class User(UserMixin, Model):
         return check_password_hash(self.password_hash, password)
     
     def get_id(self):
-        # Used by Flask-Login to manage user sessions
         return str(self.id)
 
     def is_authenticated(self):
-        # Assuming all users are authenticated once they are registered
         return True
 
     def is_active(self):
-        # Assuming all users are active by default
         return True
 
     def is_anonymous(self):
-        # We don't have anonymous users, so always return False
         return False
 
 class Wordlewords(Model):
     id = Column(Integer, primary_key=True)
     word = Column(String(10), nullable=False)
 
-class Post(Model):
+
+class Score(Model):
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    score = Column(Integer, nullable=False, default=0)
+
+    def __init__(self, user_id, score=0):
+        self.user_id = user_id
+        self.score = score
+
+    # def to_dict(self):
+    #     return {
+    #         'user_id': self.user_id,
+    #         'score': self.score
+    #     }
+
+    def set_score(self, score):
+        self.score = score
+
+    def add_score(self, score):
+        self.score += score
+
+class Wordleresult(Model):
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    datetime = Column(DateTime(100), server_default=func.now())
-    content = Column(String(128), nullable=False)
-    comments = relationship('Comment', backref='post', lazy=True) # one to many, this will add a post attribute to the comment class
+    wordlegameid = Column(Integer, ForeignKey("wordlegame.id"))
+    userid = Column(Integer, ForeignKey("user.id"))
+    attempt1 = Column(String(5))
+    attempt2 = Column(String(5))
+    attempt3 = Column(String(5))
+    attempt4 = Column(String(5))
+    attempt5 = Column(String(5))
+    attempt6 = Column(String(5))
+    result = Column(String(20), default="incomplete")
 
-    def set_content(self, content):
-        self.content = content
-
-class Comment(Model):
+class Wordlegame(Model):
     id = Column(Integer, primary_key=True)
-    post_id = Column(Integer, ForeignKey('post.id'))
-    user_id = Column(Integer, ForeignKey("user.id"))
-    datetime = Column(DateTime(100), server_default=func.now())
-    content = Column(String(128), nullable=False)
-
-    def set_content(self, content):
-        self.content = content
+    word = Column(String(10), nullable=False) #could also use wordid as a fk
+    createduserid = Column(Integer, ForeignKey("user.id"))

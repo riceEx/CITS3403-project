@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Your App</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
 </head>
 <body>
+
+<script src="static/js/script.js"></script>
 
 <div class="container mt-5">
     <div class="card">
@@ -16,12 +19,148 @@
             <p class="card-text">Hello, {{ current_user.username }}! You are logged in.</p>
             <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
             <a href="{{ url_for('wordleCreation') }}" class="btn btn-primary">Create a Wordle Game</a>
+            <a href="{{ url_for('forum') }}" class="btn btn-primary">Go to forum Page</a>
+            <button onclick="addScore()" class="btn btn-primary">add_score 5</button>
+            <button onclick="getScores()" class="btn btn-primary">getScores</button>
+            <button onclick="checkRandomWord()" class="btn btn-primary">check_Random_Word(apple)</button>
             {% else %}
             <p class="card-text">Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('register') }}">register</a> to continue.</p>
             {% endif %}
         </div>
     </div>
 </div>
+
+<div>
+    <h1>Check Word</h1>
+    <form id="wordForm">
+        <label for="wordInput">Enter a word:</label>
+        <input type="text" id="wordInput" placeholder="Enter a word">
+        <button type="button" onclick="displayWord()">Display Word</button>
+        <button type="button" onclick="checkWord()">Check</button>
+    </form>
+    <p id ="resultMessage"></p>
+    <p id="result"></p>
+</div>
+
+
+
+<!--div for leaderboard-->
+<div class="tablecontainer">
+    <header>Top 10</header>
+    <table class="table table-bordered">
+        <tr>
+            <td>No.</td>
+            <td>Users</td>
+            <td>Score</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function displayWord() {
+        var wordInput = document.getElementById("wordInput").value;
+        document.getElementById("result").innerHTML = "Word: " + wordInput;
+    }
+
+    function checkWord() {
+        var wordInput = document.getElementById("wordInput").value;
+
+        $.ajax({
+            url: '/check_user_given_word',
+            type: 'POST',
+            data: { word: wordInput },
+            success: function(response) {
+                if (response.exists) {
+                    document.getElementById("resultMessage").innerHTML = "Word exists in database.";
+                } else {
+                    document.getElementById("resultMessage").innerHTML = "Word does not exist in database.";
+                }
+            },
+            error: function(xhr, status, error) {
+                document.getElementById("resultMessage").innerHTML = "Error checking word.";
+            }
+        });
+    }
+</script>
+
+
+
+
+<script>
+    function addScore() {
+        $.post('/add_score', {user_id: Math.floor(Math.random() * 100) + 1, score: 5});
+    }
+    function getScores() {
+        $.get('/get_scores', {page_no: 1, page_size: 3, order: 'asc'});
+    }
+    function checkRandomWord() {
+        randomWord = 'apple'.split('').sort(()=>Math.random()-.5).join('');
+        $.post('wordle/check_word', {word: randomWord, wordle_id: 1});
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        //
+    });
+    socket.on("score_update", (scores) => {
+        console.warn("score updated!", scores)
+    });
+</script>
+
+
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </body>

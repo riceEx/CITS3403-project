@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Forum</title>
+    <link rel="stylesheet" href="static/css/forumStyle.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: width 0.3s ease-in-out;
+        }
+        .expanded {
+            width: 300px;
+        }
+        .filters-container, .login-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .filters-container.show, .login-container.show {
+            display: block;
+        }
+        .filters-container label, .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .filters-container select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">Filters</div>
+    <div class="filters-container" id="filtersContainer">
+        <h3>Filters</h3>
+        <label for="exactWordLengthFilter">Word Length:</label>
+    <select id="exactWordLengthFilter" onchange="updatePostsView()">
+        <option value="all">All Word Lengths</option>
+        <option value="1">1 character</option>
+        <option value="2">2 characters</option>
+        <option value="3">3 characters</option>
+        <option value="4">4 characters</option>
+        <option value="5">5 characters</option>
+        <option value="6">6 characters</option>
+        <option value="7">7 characters</option>
+        <option value="8">8 characters</option>
+        <option value="9">9 characters</option>
+        <option value="10">10 characters</option>
+        <option value="11">11 characters</option>
+        <option value="12">12 characters</option>
+        <option value="13+">More than 12 characters</option>
+    </select>
+
+
+    <select id="filterLanguage" onchange="updatePostsView()">
+        <option value="all">All Languages</option>
+        <option value="English">English</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Russian">Russian</option>
+        <option value="Filipino">Filipino</option>
+        <option value="Japanese">Japanese</option>
+    </select>
+
+    <select id="sortOption" onchange="updatePostsView()">
+        <option value="recent">Sort by Recent</option>
+        <option value="clicks">Sort by Likes</option>
+        <option value="random">Sort Randomly</option>
+        <option value="wrongAttempts">Sort by Wrong Attempts</option>
+    </select>
+
+    <input type="text" id="searchInput" placeholder="Search by hint">
+    <button onclick="searchPosts()">Search</button>
+
+    <select id="itemsPerPage" onchange="updatePostsView()">
+        <option value="10">10 items per page</option>
+        <option value="20">20 items per page</option>
+        <option value="50">50 items per page</option>
+        <option value="100">100 items per page</option>
+    </select>
+    </div>
+
+    <div class="login-tab" id="loginButton" onclick="toggleLogin()">Login</div>
+    <div class="login-container" id="loginContainer">
+        <h3>Login</h3>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter password">
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="register.html">Register</a></p>
+    </div>
+</div>
+
+<div class="container mt-5" style="margin-left: 120px;">
+    <div class="mb-4">
+        <a href="leaderboard.html" class="btn btn-primary">View Leaderboard</a>
+    </div>
+    <h1>Forum Discussions</h1>
+    <p>Welcome to the forum! Feel free to post your questions and discuss with others.</p>
+    
+    <div>
+        <input type="text" id="newPostContent" placeholder="Enter new post content">
+        <input type="text" id="newPostHint" placeholder="Enter a hint">
+
+        <div>
+    <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
+    <button onclick="addPost()">Add Post</button>
+
+    <div id="photoPreviewContainer" style="width: 100%; min-height: 100px; border: 1px solid #ccc; margin-top: 20px; padding: 10px;">
+    <ul id="sortablePhotoList" style="list-style-type: none; margin: 0; padding: 0;"></ul>
+    </div>
+
+        </div>
+
+        <select id="postLanguage">
+            <option value="English">English</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Russian">Russian</option>
+            <option value="Filipino">Filipino</option>
+            <option value="Japanese">Japanese</option>
+        </select>
+        <button onclick="addPost()">Add Post</button>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-button" onclick="showTab('active')">Active Posts</button>
+        <button class="tab-button" onclick="showTab('completed')">Completed Posts</button>
+    </div>
+
+    <div id="postsContainer">
+        <h2>Active Posts</h2>
+    </div>
+    <div id="completedPostsContainer" style="display:none;">
+        <h2>Completed Posts</h2>
+    </div>
+
+    <div class="pagination" id="pagination">
+        <!-- Pagination buttons will be added here dynamically -->
+    </div>
+</div>
+
+<script>
+let posts = JSON.parse(localStorage.getItem('posts')) || [];
+
+function updatePostsView() {
+    const filterWordLength = document.getElementById('exactWordLengthFilter').value;
+    const filterLanguage = document.getElementById('filterLanguage').value;
+    const sortOption = document.getElementById('sortOption').value;
+    const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+    const itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+
+    let filteredPosts = posts.filter(post => {
+        return (filterWordLength === 'all' || (filterWordLength === '13+' ? post.content.length > 12 : post.content.length == filterWordLength)) &&
+               (filterLanguage === 'all' || post.language === filterLanguage) &&
+               (!searchInput || post.hint.toLowerCase().includes(searchInput));
+    });
+
+    switch (sortOption) {
+        case 'recent':
+            filteredPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            break;
+        case 'clicks':
+            filteredPosts.sort((a, b) => b.clicks - a.clicks);
+            break;
+        case 'random':
+            filteredPosts = filteredPosts.sort(() => Math.random() - 0.5);
+            break;
+        case 'wrongAttempts':
+            filteredPosts.sort((a, b) => b.wrongAttempts - a.wrongAttempts);
+            break;
+    }
+
+    renderPagination(filteredPosts, itemsPerPage);
+}
+
+function renderPagination(posts, itemsPerPage) {
+    const paginationContainer = document.getElementById('pagination');
+    const totalPages = Math.ceil(posts.length / itemsPerPage);
+    let currentPage = 1;
+
+    paginationContainer.innerHTML = '';
+    for (let page = 1; page <= totalPages; page++) {
+        const button = document.createElement('button');
+        button.textContent = page;
+        button.onclick = () => renderPage(posts, page, itemsPerPage);
+        paginationContainer.appendChild(button);
+    }
+
+    renderPage(posts, currentPage, itemsPerPage);
+}
+
+function renderPage(posts, page, itemsPerPage) {
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pagePosts = posts.slice(start, end);
+
+    const activePostsContainer = document.getElementById('postsContainer');
+    const completedPostsContainer = document.getElementById('completedPostsContainer');
+    renderFilteredPosts(pagePosts.filter(post => post.status === 'active'), activePostsContainer, 'Active');
+    renderFilteredPosts(pagePosts.filter(post => post.status === 'completed'), completedPostsContainer, 'Completed');
+}
+
+function checkSidebarExpansion() {
+    const filtersVisible = document.getElementById('filtersContainer').classList.contains('show');
+    const loginVisible = document.getElementById('loginContainer').classList.contains('show');
+    const sidebar = document.getElementById('sidebar');
+
+    if (filtersVisible || loginVisible) {
+        sidebar.classList.add('expanded');
+    } else {
+        sidebar.classList.remove('expanded');
+    }
+}
+
+function toggleFilters() {
+    const filtersContainer = document.getElementById('filtersContainer');
+    filtersContainer.classList.toggle('show');
+    checkSidebarExpansion();
+}
+
+function toggleLogin() {
+    const loginContainer = document.getElementById('loginContainer');
+    loginContainer.classList.toggle('show');
+    checkSidebarExpansion();
+}
+
+function searchPosts() {
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    // If no keyword is provided, reset the view to show all posts
+    if (!keyword) {
+        updatePostsView(); // Calls the function that refreshes the entire view with all posts
+        return;
+    }
+
+    const activePostsContainer = document.getElementById('postsContainer');
+    const completedPostsContainer = document.getElementById('completedPostsContainer');
+
+    // Filtering both active and completed posts based on the hint containing the keyword
+    const filteredActivePosts = posts.filter(post => post.status === 'active' && post.hint.toLowerCase().includes(keyword));
+    const filteredCompletedPosts = posts.filter(post => post.status === 'completed' && post.hint.toLowerCase().includes(keyword));
+
+    // Display results or indicate no matches
+    renderFilteredPosts(filteredActivePosts, activePostsContainer, 'Active');
+    renderFilteredPosts(filteredCompletedPosts, completedPostsContainer, 'Completed');
+
+    // Filtered search applying all active filter settings
+    updatePostsView(keyword);
+}
+
+function renderFilteredPosts(filteredPosts, container, status) {
+    container.innerHTML = `<h2>${status} Posts</h2>`;
+    if (filteredPosts.length === 0) {
+        container.innerHTML += '<p>No posts found matching your criteria.</p>';
+    } else {
+        filteredPosts.forEach(post => {
+            const elapsedTime = getElapsedTime(post.timestamp);
+            const postElement = document.createElement('div');
+            postElement.className = 'post';
+            postElement.innerHTML = createPostHTML(post, elapsedTime);
+            container.appendChild(postElement);
+        });
+    }
+}
+
+
+function toggleDropdown(postId) {
+    const postContainer = document.querySelector(`#post_${postId}`);
+    const dropdown = document.getElementById(`dropdown_${postId}`);
+    const isVisible = dropdown.style.display === 'block';
+
+    // Toggle the display of the dropdown
+    dropdown.style.display = isVisible ? 'none' : 'block';
+
+    // Toggle the selected class on the post container
+    if (isVisible) {
+        postContainer.classList.remove('selected');
+    } else {
+        postContainer.classList.add('selected');
+    }
+}
+function toggleDropdownMenu(postId) {
+    const dropdownMenu = document.getElementById(`dropdown_${postId}`);
+    dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleHint(postId) {
+    const hintElement = document.getElementById(`hint_${postId}`);
+    if (hintElement.style.display === 'none') {
+        hintElement.style.display = 'block';
+        incrementClickCount(postId); // Increment click count when showing hint
+    } else {
+        hintElement.style.display = 'none';
+    }
+}
+
+function incrementClickCount(postId) {
+    const post = posts.find(p => p.id === postId);
+    if (post.clicks === 0) {
+        post.clicks = 1;
+    } else {
+        post.clicks += 0.5;
+    }
+    document.getElementById(`clicks_${postId}`).textContent = `Clicks: ${post.clicks}`;
+    savePosts();
+    updatePostsView();
+}
+
+function deletePost(postId) {
+    posts = posts.filter(p => p.id !== postId);
+    savePosts();
+    updatePostsView();
+}
+
+function editPost(postId) {
+    const post = posts.find(p => p.id === postId);
+    const newContent = prompt('Enter the new content for the post:', post.content);
+    if (newContent !== null) {
+        post.content = newContent;
+        savePosts();
+        updatePostsView();
+    }
+}
+
+function checkInput(postId) {
+    const post = posts.find(p => p.id === postId);
+    const input = document.getElementById(`input_${postId}`).value;
+
+    // Check if the user's input matches the correct content
+    if (input.trim() === post.content) {
+        post.status = 'completed';  // Mark the post as completed
+        alert('Correct! The post has been completed.');
+        savePosts();  // Save changes to localStorage
+        updatePostsView();  // Refresh the view to reflect changes
+    } else {
+        post.attempts--;  // Decrement the attempts
+
+        // Provide feedback based on the remaining number of attempts
+        if (post.attempts > 0) {
+            alert(`Incorrect. You have ${post.attempts} attempts remaining.`);
+        } else {
+            post.wrongAttempts++;  // Increment the wrong attempts counter if attempts are exhausted
+            alert('No attempts left. Please try another post.');
+            post.attempts = 4;  // Optionally reset attempts for a new try
+            document.getElementById(`wrongAttempts_${postId}`).innerText = post.wrongAttempts; // Update wrong attempts in the UI
+        }
+
+        // Update UI elements based on remaining attempts
+        document.getElementById(`input_${postId}`).disabled = (post.attempts === 0);
+        document.getElementById(`input_${postId}`).style.borderColor = (post.attempts === 0 ? 'red' : 'initial');
+
+        savePosts();  // Save changes to local storage
+        updatePostsView();  // Refresh the view to show updated attempt counts and statuses
+    }
+}
+
+function inputChecking(postId) {
+    const post = posts.find(p => p.id === postId);
+    const inputValue = prompt('Enter input to check:');
+    if (inputValue === post.content) {
+        post.status = 'completed'; // Move to completed posts
+        savePosts();
+    } else {
+        post.attempts--;
+        if (post.attempts === 0) {
+            const hintElement = document.getElementById(`hint_${postId}`);
+            hintElement.innerHTML += '<br><input type="checkbox" style="background-color: red;" disabled>';
+        }
+        savePosts();
+    }
+    updatePostsView();
+}
+
+function showTab(status) {
+    const activeContainer = document.getElementById('postsContainer');
+    const completedContainer = document.getElementById('completedPostsContainer');
+    const activeBtn = document.querySelector('.tab-button:first-child');
+    const completedBtn = document.querySelector('.tab-button:last-child');
+
+    if (status === 'active') {
+        activeContainer.style.display = 'block';
+        completedContainer.style.display = 'none';
+        activeBtn.classList.add('active');
+        completedBtn.classList.remove('active');
+    } else {
+        completedContainer.style.display = 'block';
+        activeContainer.style.display = 'none';
+        completedBtn.classList.add('active');
+        activeBtn.classList.remove('active');
+    }
+    updatePostsView(); // Render posts based on the selected tab and filter
+}
+
+function getElapsedTime(timestamp) {
+    const now = new Date();
+    const elapsed = now - new Date(timestamp);
+    const minutes = Math.floor(elapsed / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    if (days > 0) return `${days} days ago`;
+    if (hours > 0) return `${hours} hours ago`;
+    if (minutes > 0) return `${minutes} minutes ago`;
+    return 'Just now';
+}
+
+function toggleLike(postId) {
+    const post = posts.find(p => p.id === postId);
+    const likeButton = document.getElementById(`likeButton_${post.id}`);
+
+    if (!post.liked) {  // Check if the post has not been liked yet
+        post.clicks++;  // Increment the like counter
+        post.liked = true;  // Mark the post as liked
+    } else {
+        post.clicks--;  // Decrement the like counter if unliking
+        post.liked = false; // Mark as not liked
+    }
+
+    likeButton.innerHTML = `&#10084; ${post.clicks} Likes`; // Update the button text to show current number of likes
+    savePosts();  // Save the updated state to local storage
+    updatePostsView();  // Refresh the view to show updated like counts and statuses
+}
+
+
+function savePosts() {
+    localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+function loadPosts() {
+    const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
+    posts = savedPosts.map(post => ({
+        ...post,
+        liked: post.liked || false,
+        clicks: post.clicks || 0
+    }));
+    updatePostsView();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPosts(); // Load posts when the document is ready
+    showTab('active'); // Show the active tab initially
+    // Get the label element for the file input
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+
+    // Add click event listener to the label
+    fileUploadLabel.addEventListener('click', function() {
+        // Trigger a click event on the file input element
+        document.getElementById('photoUpload').click();
+    });
+});
+
+function addPost() {
+    const content = document.getElementById('newPostContent').value;
+    const hint = document.getElementById('newPostHint').value;
+    const languageSelect = document.getElementById('postLanguage');
+    const language = languageSelect.options[languageSelect.selectedIndex].value;
+    const postId = posts.length + 1; // Calculate next post ID based on the array length
+
+    if (!content) {
+        alert('Please enter some content to add a post.');
+        return;
+    }
+
+    // Retrieve the images associated with this post from sessionStorage
+    const uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};
+    const photos = uploadedPhotos[postId] || []; // Retrieve photos using the postId
+
+    const newPost = {
+        id: String(postId),
+        content: content,
+        hint: hint,
+        language: language,
+        photos: photos, // Attach the photos to the new post
+        clicks: 0,
+        attempts: 4,
+        wrongAttempts: 0,
+        timestamp: new Date(),
+        status: 'active'
+    };
+
+    posts.push(newPost);
+    savePosts();
+    updatePostsView();
+    document.getElementById('newPostContent').value = '';
+    document.getElementById('newPostHint').value = '';
+    // Clear the temporary storage for this post ID to prevent duplication
+    delete uploadedPhotos[postId];
+    sessionStorage.setItem('uploadedPhotos', JSON.stringify(uploadedPhotos));
+}
+
+function createPostHTML(post, elapsedTime) {
+    let photosHtml = '';
+    if (post.photos && post.photos.length) {
+        photosHtml = '<div class="post-photos">';
+        post.photos.forEach(photoUrl => {
+            photosHtml += `<img src="${photoUrl}" alt="Uploaded Photo" style="width:100%; display: block; max-height: 150px; object-fit: cover; margin-bottom: 5px;">`;
+        });
+        photosHtml += '</div>';
+    }
+
+    return `
+<div class="post-container" id="post_${post.id}" onclick="toggleDropdown('${post.id}');">
+    ${photosHtml}  <!-- Render the photos here -->
+    <div class="user-photo">
+        <img src="${post.photoUrl || 'default-photo.png'}" alt="User Photo" />
+    </div>
+    <h3 class="hint">${post.hint}</h3>
+    <div class="like-container">
+        <button id="likeButton_${post.id}" class="like-button" onclick="toggleLike('${post.id}'); event.stopPropagation();">
+            &#10084; ${post.clicks}
+        </button>
+        <div class="wrong-attempts" style="color: red; font-weight: bold;">
+            <span id="wrongAttempts_${post.id}">${post.wrongAttempts}</span>
+        </div>
+    </div>
+    <button class="view-button" onclick="viewPost('${post.id}'); event.stopPropagation();">View</button>
+    <span class="time-posted">${elapsedTime}</span>
+    <div id="dropdown_${post.id}" class="dropdown-content" style="display: none;">
+        <p>${post.content} (${post.language}) - <small>${elapsedTime}</small></p>
+        <span id="clicks_${post.id}">Clicks: ${post.clicks}</span>
+        <a class="dropdown-item" href="#" onclick="editPost('${post.id}'); event.stopPropagation();">Edit</a>
+        <a class="dropdown-item" href="#" onclick="deletePost('${post.id}'); event.stopPropagation();">Delete</a>
+        <a class="dropdown-item" href="#" onclick="incrementClickCount('${post.id}'); event.stopPropagation();">Increment Click Count</a>
+        <input type="text" id="input_${post.id}" placeholder="Enter content here" ${post.attempts === 0 ? 'disabled' : ''} style="border-color: ${post.attempts === 0 ? 'red' : 'initial'};" onclick="event.stopPropagation();">
+        <button id="checkButton_${post.id}" onclick="checkInput('${post.id}'); event.stopPropagation();">Check</button>
+        <a class="dropdown-item" href="#" onclick="inputChecking('${post.id}'); event.stopPropagation();">Input Checking</a>
+    </div>
+</div>`;
+}
+
+
+function uploadPhotos(event) {
+    const postId = posts.length + 1; // Predicting the new post's ID based on existing posts
+    const files = Array.from(event.target.files);
+    if (files.length > 6) {
+        alert('You can upload a maximum of 6 photos.');
+        return;
+    }
+
+    const photoPromises = files.map(file => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = () => reject('Failed to read file.');
+            reader.readAsDataURL(file);
+        });
+    });
+
+    Promise.all(photoPromises).then(images => {
+        // Store the images temporarily, keyed by the post ID
+        let uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};
+        uploadedPhotos[postId] = images; // Store images array under the corresponding postId
+        sessionStorage.setItem('uploadedPhotos', JSON.stringify(uploadedPhotos));
+    }).catch(error => {
+        alert(error);
+    });
+}
+
+function viewPost(postId) {
+    // In a real application, this would navigate to a URL serving the post's content
+    window.location.href = `/posts/${postId}.html`; // This assumes you have a routing setup to handle this URL
+}
+
+document.getElementById('photoUpload').addEventListener('change', function(event) {
+    const files = Array.from(event.target.files);
+    const photoContainer = document.getElementById('sortablePhotoList');
+    photoContainer.innerHTML = ''; // Clear existing thumbnails if any
+
+    files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const li = document.createElement('li');
+            li.style = 'margin: 5px; padding: 5px; float: left; list-style-type: none;';
+            li.innerHTML = `<img src="${e.target.result}" style="width: 100px; height: auto; cursor: grab;">`;
+            li.setAttribute('draggable', 'true');
+            li.setAttribute('data-index', index);
+            photoContainer.appendChild(li);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sortableList = document.getElementById('sortablePhotoList');
+
+    let draggedItem = null;
+
+    sortableList.addEventListener('dragstart', function(e) {
+        draggedItem = e.target;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', draggedItem);
+    }, false);
+
+    sortableList.addEventListener('dragover', function(e) {
+        e.preventDefault(); // Necessary to allow dropping
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }, false);
+
+    sortableList.addEventListener('drop', function(e) {
+        if (e.target.tagName === 'LI' && draggedItem !== e.target) {
+            const listItems = Array.from(sortableList.children);
+            const targetIndex = listItems.indexOf(e.target);
+            sortableList.insertBefore(draggedItem, listItems[targetIndex]);
+        }
+        e.preventDefault(); // Prevent default to allow drop
+    }, false);
+
+    sortableList.addEventListener('dragend', function(e) {
+        e.preventDefault();
+        draggedItem = null;
+    }, false);
+});
+
+
+
+</script>
+
+
+
+</body>
+</html>
