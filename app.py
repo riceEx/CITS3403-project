@@ -28,7 +28,7 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=current_user)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -53,37 +53,26 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    username = request.form['username']
+    password = request.form['password']
 
-        user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
-            login_user(user)
-            return redirect(url_for('welcomePage'))
-        else:
-            flash('Invalid username or password.', 'error')
-
-    return render_template('login.html')
-
-
-@app.route('/welcomePage')
-@login_required
-def welcomePage():
-    if current_user.is_authenticated:
-        return render_template('welcomePage.html', user=current_user)
+    if user and user.check_password(password):
+        login_user(user)
+        return redirect(url_for('index'))
     else:
-        return redirect(url_for('login'))
+        flash('Incorrect username or password', 'error')
+        return redirect(url_for('index'))
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return jsonify({'message': 'Logout successful'}), 200
 
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
 @app.errorhandler(Unauthorized)
