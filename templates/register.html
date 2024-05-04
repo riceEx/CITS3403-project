@@ -4,30 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <script src="static/js/script.js"></script>
     <div class="container mt-5">
         <h2>User Registration</h2>
+        <div class="container mt-5">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-info" role="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
         <form method="POST">
             <div class="form-group">
-                <label for="username">Username:</label>
+                <label for="username">Username<span class="text-danger">*</span>:</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email<span class="text-danger">*</span>:</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Password<span class="text-danger">*</span>:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
+            <div class="form-group">
+                <label for="gender">Gender<span class="text-danger">*</span>:</label>
+                <select class="form-control" id="gender" name="gender" required>
+                    <option value="">Choose Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth<span class="text-danger">*</span>:</label>
+                <input type="date" class="form-control" id="dob" name="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" class="form-control" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="country">Country<span class="text-danger">*</span>:</label>
+                <select class="form-control" id="country" name="country" required>
+                    <option value="">Choose Country</option>
+                    <option value="Afghanistan">Afghanistan</option>
+                    <option value="Albania">Albania</option>
+                    <option value="Algeria">Algeria</option>
+                    <option value="Andorra">Andorra</option>
+                    <option value="Angola">Angola</option>
+                    <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Armenia">Armenia</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Austria">Austria</option>
+                    <option value="Azerbaijan">Azerbaijan</option>
+                    <option value="Bahamas">Bahamas</option>
+                    <option value="Bahrain">Bahrain</option>
+                    <option value="Bangladesh">Bangladesh</option>
+                    <option value="Barbados">Barbados</option>
+                    <option value="Belarus">Belarus</option>
+                    <option value="Belgium">Belgium</option>
+                    <option value="Belize">Belize</option>
+                    <option value="Benin">Benin</option>
+                    <option value="Bhutan">Bhutan</option>
+                    <option value="Bolivia">Bolivia</option>
+                    <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                    <option value="Botswana">Botswana</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Brunei">Brunei</option>
+                    <option value="Bulgaria">Bulgaria</option>
+                    <option value="Burkina Faso">Burkina Faso</option>
+                    <option value="Burundi">Burundi</option>
+                    <option value="Cabo Verde">Cabo Verde</option>
+                    <option value="Cambodia">Cambodia</option>
+                    <option value="Cameroon">Cameroon</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Central African Republic">Central African Republic</option>
+                    <option value="Chad">Chad</option>
+                    <option value="Chile">Chile</option>
+                    <option value="China">China</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Comoros">Comoros</option>
+                    <option value="Congo (Congo-Brazzaville)">Congo (Congo-Brazzaville)</option>
+                    <option value="Costa Rica">Costa Rica</option>
+                    <option value="Croatia">Croatia</option>
+                    <option value="Cuba">Cuba</option>
+                    <option value="Cyprus">Cyprus</option>
+                    <option value="Czechia (Czech Republic)">Czechia (Czech Republic)</option>
+                    <option value="Denmark">Denmark</option>
+                    <option value="Djibouti">Djibouti</option>
+                    <option value="Dominica">Dominica</option>
+                    <option value="Dominican Republic">Dominican Republic</option>
+                    <option value="Ecuador">Ecuador</option>
+                    <option value="Egypt">Egypt</option>
+                    <option value="El Salvador">El Salvador</option>
+                    <option value="Equatorial Guinea">Equatorial Guinea</option>
+                    <option value="Eritrea">Eritrea</option>
+                    <option value="Estonia">Estonia</option>
+                    <option value="Ethiopia">Ethiopia</option>
+                    <option value="Fiji">Fiji</option>
+                    <option value="Finland">Finland</option>
+                    <option value="France">France</option>
+                    <option value="Gabon">Gabon</option>
+                    <option value="Gambia">Gambia</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Ghana">Ghana</option>
+                    <option value="Greece">Greece</option>
+                    <option value="Grenada">Grenada</option>
+                    <option value="Guatemala">Guatemala</option>
+                    <option value="Guinea">Guinea</option>
+                    <option value="Guinea-Bissau">Guinea-Bissau</option>
+                    <option value="Guyana">Guyana</option>
+                    <option value="Haiti">Haiti</option>
+                    <option value="Holy See">Holy See</option>
+                    <option value="Honduras">Honduras</option>
+                    <option value="Hungary">Hungary</option>
+                    <option value="Iceland">Iceland</option>
+                    <option value="India">India</option>
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Iran">Iran</option>
+                    <option value="Iraq">Iraq</option>
+                    <option value="Ireland">Ireland</option>
+                    <option value="Israel">Israel</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Jamaica">Jamaica</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Jordan">Jordan</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="avatar">Choose Avatar<span class="text-danger">*</span>:</label>
+                <select class="form-control" id="avatar" name="avatar" required onchange="displayAvatar()">
+                    <option value="">Choose Avatar</option>
+                    <option value="avatar-1.png">Pikachu</option>
+                    <option value="avatar-2.png">Baby Groot</option>
+                    <option value="avatar-3.png">Toothless</option>
+                    <option value="avatar-4.png">Spiderman</option>
+                    <option value="avatar-5.png">Morty</option>
+                    <option value="avatar-6.png">Crash</option>
+                    <option value="avatar-7.png">Dog</option>
+                    <option value="avatar-8.png">Tree</option>
+                    <option value="avatar-9.png">Snoopy</option>
+                    <option value="avatar-10.png">Cat</option>
+                </select>
+            </div>
+            <div id="avatarDisplay"></div>
+        </br>
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
         <div class="mt-3">
             <a href="{{ url_for('index') }}">Already have an account? Login here</a>
         </div>
     </div>
+
+    <script>
+        function displayAvatar() {
+            var select = document.getElementById("avatar");
+            var selectedOption = select.options[select.selectedIndex].value;
+            var avatarDisplay = document.getElementById("avatarDisplay");
+            avatarDisplay.innerHTML = '<img src="/static/img/' + selectedOption + '" alt="Selected Avatar" class="img-fluid" style="max-width: 150px; max-height: 150px;">';
+        }
+    </script>
 </body>
 </html>

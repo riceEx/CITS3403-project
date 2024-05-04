@@ -6,10 +6,11 @@ from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
 from database.models import db, User
 from werkzeug.exceptions import Unauthorized
+from datetime import datetime
 import sqlite3
 import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -37,12 +38,27 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        gender = request.form['gender']
+        dob_str = request.form['dob']
+        phone = request.form['phone']
+        country = request.form['country']
+        avatar = request.form['avatar']  # Selected avatar filename
+
+        dob = datetime.strptime(dob_str, '%Y-%m-%d')
 
         if User.query.filter_by(username=username).first():
             flash('Username already exists.', 'error')
             return redirect(url_for('register'))
 
-        new_user = User(username=username, email=email)
+        new_user = User(
+            username=username,
+            email=email,
+            gender=gender,
+            dob=dob,
+            phone=phone,
+            country=country,
+            avatar=avatar)
+
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
