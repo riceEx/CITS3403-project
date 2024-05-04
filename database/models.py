@@ -13,6 +13,11 @@ class User(UserMixin, Model):
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
+    gender = Column(String(10), nullable=False)
+    dob = Column(DateTime, nullable=False)
+    phone = Column(String(20))
+    country = Column(String(50), nullable=False)
+    avatar = Column(String(20), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
