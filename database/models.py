@@ -18,6 +18,7 @@ class User(UserMixin, Model):
     phone = Column(String(20))
     country = Column(String(50), nullable=False)
     avatar = Column(String(20), nullable=False)
+    score = Column(db.Integer, default=0)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
