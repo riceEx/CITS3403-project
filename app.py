@@ -90,6 +90,29 @@ def logout():
     logout_user()
     return jsonify({'message': 'Logout successful'}), 200
 
+# add_post, create a new post
+# @param user_id which user created the post
+# @param content post content
+# @param hint hint to the guessing game
+# @param language, source language of the hint, default is english
+@app.route('/add_post', methods=['POST'])
+#! @login_required
+def add_post():
+    _user_id = request.form["user_id"]
+    _content = request.form["content"]
+    _hint = request.form["hint"]
+    #if user_id, content or hint is not provided, return error
+    if not _user_id or not _content or not _hint:
+        return jsonify({'message': 'Missing parameters'}), 400
+    _language = request.form["language"] or 'en'
+
+    score = Post(user_id=_user_id, content=_content, hint=_hint, language=_language)
+    db.session.add(score)
+    db.session.commit()
+
+    flash('Post added!', 'success')
+    return jsonify({ "result": score.to_dict() })
+
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented

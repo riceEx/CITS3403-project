@@ -53,3 +53,15 @@ class Score(Model):
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+class Post(Model):
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    datetime = Column(DateTime(100), server_default=func.now())
+    content = Column(String(128), nullable=False)
+    hint = Column(String(128), nullable=False)
+    language = Column(String(10), nullable=False, default='en')
+    status = Column(Boolean, nullable=False, default=False) # false: active, true: completed
+    comments = relationship('Comment', backref='post', lazy=True) # one to many, this will add a post attribute to the comment class
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
