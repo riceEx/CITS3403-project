@@ -90,6 +90,12 @@ def logout():
     logout_user()
     return jsonify({'message': 'Logout successful'}), 200
 
+
+#TODO for testing purposes, remove in production
+@app.route('/test')
+def test():
+    return render_template('test.html', user=current_user)
+
 # add_post, create a new post
 # @param user_id which user created the post
 # @param content post content
