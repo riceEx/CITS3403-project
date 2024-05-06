@@ -65,3 +65,12 @@ class Post(Model):
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+class Comment(Model):
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('post.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
+    datetime = Column(DateTime(100), server_default=func.now())
+    content = Column(String(128), nullable=False)
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

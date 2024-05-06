@@ -113,6 +113,50 @@ def add_post():
     flash('Post added!', 'success')
     return jsonify({ "result": score.to_dict() })
 
+# add_comment, create a comment to a post
+# @param user_id which user created the post
+# @param content post content
+@app.route('/add_comment', methods=['POST'])
+#! @login_required
+def add_comment():
+    _user_id = request.form["user_id"]
+    _post_id = request.form["post_id"]
+    _content = request.form["content"]
+    #if user_id, content or hint is not provided, return error
+    if not _user_id or not _content or not _post_id:
+        return jsonify({'message': 'Missing parameters'}), 400
+
+    try:
+        # Begin a transaction of multiple operations
+        with db.session.begin():
+            comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
+            db.session.add(comment)
+            check_game(_user_id, _post_id, _content)
+            db.session.commit()
+
+    except Exception as e:
+        print("add_comment error:", e)
+        # Roll back the transaction if any error occurs
+        db.session.rollback()
+        return jsonify({'message': 'An error has occurred, please submit again'}), 400
+
+    flash('Comment added!', 'success')
+    return jsonify({ "result": comment.to_dict() })
+
+def check_game(user_id: int, post_id: int, content: str):
+    post = db.session.execute(db.select(Post).filter_by(id=post_id)).scalar_one_or_none()
+    _answer = post.content
+    if (_answer == content):
+        # update post status to completed
+        post.status = True
+        flash('Post status updated!', 'success')
+
+        #TODO add_score to user, currently just add 1
+        add_score(user_id, score = 1)
+
+# TODO add_like
+# @app.route('/add_like', methods=['POST'])
+
 # add_score, increment score to current user if existed, else create new score
 # @param user_id which user to be updated
 # @param score score to be incremented
