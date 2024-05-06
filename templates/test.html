@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Your App</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<script src="static/js/script.js"></script>
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Welcome to Your App!</h2>
+            <p class="card-text">Hello, {{ current_user.username }}! You are logged in.</p>
+            <button onclick="addPost()" class="btn btn-primary">addPost('apple')</button>
+            <button onclick="addComment('banana')" class="btn btn-primary">addComment('banana')</button>
+            <button onclick="addComment('apple')" class="btn btn-primary">addComment('apple')</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addPost() {
+        $.post('/add_post', {user_id: 1, content: 'apple', hint: 'Como se dese la manzana in English?', language: 'es'});
+    }
+    function addComment(content) {
+        $.post('/add_comment', {user_id: 1, post_id: 1, content: content});
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        //
+    });
+    socket.on("score_update", (scores) => {
+        console.warn("score updated!", scores)
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</body>
+</html>

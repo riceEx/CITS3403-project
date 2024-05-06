@@ -36,3 +36,41 @@ class User(UserMixin, Model):
 
     def is_anonymous(self):
         return False
+
+class Score(Model):
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    score = Column(Integer, nullable=False, default=0)
+
+    def __init__(self, user_id, score=0):
+        self.user_id = user_id
+        self.score = score
+
+    def set_score(self, score):
+        self.score = score
+
+    def add_score(self, score):
+        self.score += score
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+class Post(Model):
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    datetime = Column(DateTime(100), server_default=func.now())
+    content = Column(String(128), nullable=False)
+    hint = Column(String(128), nullable=False)
+    language = Column(String(10), nullable=False, default='en')
+    status = Column(Boolean, nullable=False, default=False) # false: active, true: completed
+    comments = relationship('Comment', backref='post', lazy=True) # one to many, this will add a post attribute to the comment class
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+class Comment(Model):
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('post.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
+    datetime = Column(DateTime(100), server_default=func.now())
+    content = Column(String(128), nullable=False)
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
