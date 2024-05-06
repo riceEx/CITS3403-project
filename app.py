@@ -4,7 +4,7 @@ from flask_session import Session
 from flask_socketio import SocketIO
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
-from database.models import db, User
+from database.models import db, User, Score, Post, Comment
 from werkzeug.exceptions import Unauthorized
 from datetime import datetime
 import sqlite3
@@ -89,6 +89,65 @@ def login():
 def logout():
     logout_user()
     return jsonify({'message': 'Logout successful'}), 200
+
+# add_score, increment score to current user if existed, else create new score
+# @param user_id which user to be updated
+# @param score score to be incremented
+# return {Score} object
+def add_score(user_id: int, score: int):
+    _user_id = user_id
+    _score = score
+
+    # fetch current score of user
+    score = db.session.execute(db.select(Score).filter_by(user_id=_user_id)).scalar_one_or_none()
+    # create score if not existed
+    if not score:    
+        score = Score(user_id=_user_id, score=int(_score))
+        db.session.add(score)
+    else:
+        score.score += int(_score)
+
+    flash('Score added!', 'success')
+    return score
+
+# event listener for score update
+# send top10 result to frontend when score has an update
+def after_update_listener(mapper, connection, target):
+    # state.get_history() can be used to get the history of attributes
+    # It returns a History object with three lists: added, unchanged, and deleted
+    state = db.inspect(target)
+    if state.attrs.score.history.has_changes():
+        scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(Score.score.desc()).paginate(page=1, per_page=10, error_out=False)
+        
+        result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
+        # Emit the top 10 scores
+        socketio.emit('score_update', result)
+# Attach the listener to the Score class, listening to 'after_update'
+event.listen(Score, 'after_update', after_update_listener)
+
+# get_scores, get scores of all users
+# @param page_no page number
+# @param page_size page size
+# @param order: asc or desc
+@app.route('/get_scores', methods=['GET'])
+@login_required
+def get_scores():
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'error': 'Unauthorized'}), 403
+    page_no = request.args.get("page_no", 1)
+    page_size = request.args.get("page_size", 10)
+    order = request.args.get("order", 'desc')   
+    order_method = getattr(Score.score, order)
+
+    scores = db.session.query(Score.user_id.label('user_id'), Score.score.label('score'), User.username.label('username')).join(User, Score.user_id == User.id).order_by(order_method()).paginate(page=int(page_no), per_page=int(page_size), error_out=False)
+
+    # transform score models to list of dicts
+    # result = [score.to_dict() for score in scores.items]
+    result = [{'user_id': score.user_id, 'score': score.score, 'user_name': score.username} for score in scores.items]
+
+    flash('Score fetched!', 'success')
+    # return result as JSON
+    return jsonify({"result": result, "total": scores.total})
 
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
 @app.errorhandler(Unauthorized)
