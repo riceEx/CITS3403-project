@@ -9,6 +9,7 @@ from werkzeug.exceptions import Unauthorized
 from datetime import datetime
 import sqlite3
 import random
+import traceback
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -134,14 +135,14 @@ def add_comment():
 
     try:
         # Begin a transaction of multiple operations
+        db.session.close()
         with db.session.begin():
             comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
             db.session.add(comment)
             check_game(_user_id, _post_id, _content)
             db.session.commit()
-
     except Exception as e:
-        print("add_comment error:", e)
+        traceback.print_exc()
         # Roll back the transaction if any error occurs
         db.session.rollback()
         return jsonify({'message': 'An error has occurred, please submit again'}), 400
