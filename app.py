@@ -9,6 +9,7 @@ from werkzeug.exceptions import Unauthorized
 from datetime import datetime
 import sqlite3
 import random
+import traceback
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -107,9 +108,9 @@ def test():
 # @param hint hint to the guessing game
 # @param language, source language of the hint, default is english
 @app.route('/add_post', methods=['POST'])
-#! @login_required
+@login_required
 def add_post():
-    _user_id = request.form["user_id"]
+    _user_id = current_user.id
     _content = request.form["content"]
     _hint = request.form["hint"]
     #if user_id, content or hint is not provided, return error
@@ -125,12 +126,12 @@ def add_post():
     return jsonify({ "result": score.to_dict() })
 
 # add_comment, create a comment to a post
-# @param user_id which user created the post
+# @param post_id which post the comment belongs to
 # @param content post content
 @app.route('/add_comment', methods=['POST'])
-#! @login_required
+@login_required
 def add_comment():
-    _user_id = request.form["user_id"]
+    _user_id = current_user.id
     _post_id = request.form["post_id"]
     _content = request.form["content"]
     #if user_id, content or hint is not provided, return error
@@ -139,14 +140,14 @@ def add_comment():
 
     try:
         # Begin a transaction of multiple operations
+        db.session.close()
         with db.session.begin():
             comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
             db.session.add(comment)
             check_game(_user_id, _post_id, _content)
             db.session.commit()
-
     except Exception as e:
-        print("add_comment error:", e)
+        traceback.print_exc()
         # Roll back the transaction if any error occurs
         db.session.rollback()
         return jsonify({'message': 'An error has occurred, please submit again'}), 400
