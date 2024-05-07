@@ -102,9 +102,9 @@ def test():
 # @param hint hint to the guessing game
 # @param language, source language of the hint, default is english
 @app.route('/add_post', methods=['POST'])
-#! @login_required
+@login_required
 def add_post():
-    _user_id = request.form["user_id"]
+    _user_id = current_user.id
     _content = request.form["content"]
     _hint = request.form["hint"]
     #if user_id, content or hint is not provided, return error
@@ -120,12 +120,12 @@ def add_post():
     return jsonify({ "result": score.to_dict() })
 
 # add_comment, create a comment to a post
-# @param user_id which user created the post
+# @param post_id which post the comment belongs to
 # @param content post content
 @app.route('/add_comment', methods=['POST'])
-#! @login_required
+@login_required
 def add_comment():
-    _user_id = request.form["user_id"]
+    _user_id = current_user.id
     _post_id = request.form["post_id"]
     _content = request.form["content"]
     #if user_id, content or hint is not provided, return error
