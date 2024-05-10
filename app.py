@@ -32,9 +32,12 @@ def load_user(user_id):
 def index():
     return render_template('index.html', user=current_user)
 
+@app.route('/create')
+def create():
+    return render_template('create.html', user=current_user)
+ 
 @app.route('/leaderboard')
 def leaderboard():
-    users = User.query.order_by(User.score.desc()).limit(10).all()
     return render_template('leaderboard.html', user=current_user)
 
 
