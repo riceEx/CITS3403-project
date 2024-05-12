@@ -140,35 +140,9 @@
         <a href="{{ url_for('leaderboard') }}" class="btn btn-primary">View Leaderboard</a>
     </div>
     <div class="mb-4">
-        <a href="{{ url_for('create') }}" class="button">Create Posts!</a>
+        <a href="{{ url_for('create') }}" class="btn btn-primary">Create Posts!</a>
     </div>
-    <h1>Guess or be guessed</h1>
-    <p>Let others figure you out, or figure others out</p>
-    
-    <div>
-        <input type="text" id="newPostContent" placeholder="Enter new post content">
-        <input type="text" id="newPostHint" placeholder="Enter a hint">
 
-        <div>
-            <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
-            <button onclick="addPost()">Add Post</button>
-
-            <div id="photoPreviewContainer" style="width: 100%; min-height: 100px; border: 1px solid #ccc; margin-top: 20px; padding: 10px;">
-                <ul id="sortablePhotoList" style="list-style-type: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;"></ul>
-            </div>
-            <input type="file" id="photoUpload" multiple accept="image/*">
-        </div>
-
-        <select id="postLanguage">
-            <option value="English">English</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Russian">Russian</option>
-            <option value="Filipino">Filipino</option>
-            <option value="Japanese">Japanese</option>
-        </select>
-        <button onclick="addPost()">Add Post</button>
-        <button onclick="addPostImageTest()">addPostImageTest</button>
-    </div>
     
     <div class="tabs">
         <button class="tab-button" onclick="showTab('active')">Active Posts</button>
@@ -210,12 +184,12 @@
 <script>
 function addPostImageTest() {
     let posts = JSON.parse(localStorage.getItem('posts')) || [];
-const postId = posts.length + 1; // Calculate next post ID based on the array length
+    const postId = posts.length + 1; // Calculate next post ID based on the array length
        // Retrieve the images associated with this post from sessionStorage
        const uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};
     const photos = uploadedPhotos[postId] || []; // Retrieve photos using the postId
 
-    $.post('/add_post', {user_id: 1, content: 'apple', hint: 'Como se dese la manzana in English?', language: 'es', images: photos});
+    $.post('/add_post', {content: 'apple', hint: '', language: 'es', images: photos});
 }
 </script>
 

@@ -3,43 +3,89 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Leaderboard</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+        <title>CreatePost</title>
         <style>
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 80px;
+                height: 100%;
+                overflow-y: auto;
+                padding: 20px;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                transition: width 0.3s ease-in-out;
+            }
+            .expanded {
+                width: 300px;
+            }
+            .filters-container, .login-container {
+                display: none;
+                margin-top: 20px;
+            }
+            .filters-container.show, .login-container.show {
+                display: block;
+            }
+            .filters-container label, .login-container label {
+                display: block;
+                margin-bottom: 5px;
+            }
+            .filters-container select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .pagination {
+                margin-top: 20px;
+            }
+            .pagination button {
+                margin-right: 5px;
+            }            
             body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
                 margin: 0;
                 padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh; 
+                background-color: #ffffff; 
+                
             }
+            #newPostHint {
+                width: 100%;
+                padding: 10px; 
+            }
+            #newPostContent {
+                width: 40%;
+                padding: 10px; 
+            }            
             .container {
-                max-width: 800px;
-                margin: 20px auto;
-                padding: 20px;
-                background-color: #fff;
+                width: 100%; 
+                max-width: 1000px; 
+                padding: 50px; 
+                background-color: white;
                 border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+                display: flex;
+                flex-direction: column; 
+                justify-content: center; 
+                align-items: center; 
+                font-size: 18px; 
             }
+            @media only screen and (max-width: 600px) {
+            #container {
+                width: 90%; }
+            #body {
+                margin-left: auto;
+            }
+            }
+
             h1 {
                 text-align: center;
                 color: #333;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            th, td {
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            tr:hover {
-                background-color: #f2f2f2;
             }
             .button {
                 display: block;
@@ -47,36 +93,117 @@
                 width: 100px;
                 margin: 20px auto;
                 padding: 10px;
-                background-color: #8b8b8b;
+                background-color: #0015ff;
                 color: white;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
+                
             }
             .button:hover {
-                background-color: #000000;
+                background-color: #b3b9ff;
             }
         </style>
-<div class="container mt-5" style="margin-left: 120px;">
+<div class="sidebar" id="sidebar">
+    <div class="login-tab" id="loginButton" onclick="toggleLogin()">
+        {% if current_user.is_authenticated %}
+            {{ current_user.username }} | <button onclick="logout()">Logout</button>
+        {% else %}
+            Login
+        {% endif %}
+    </div>
+    <div class="login-container" id="loginContainer">
+        {% if current_user.is_authenticated %}
+            
+        {% else %}
+            <h3>Login</h3>
+            <form id="loginForm" method="POST" action="/create">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+        {% endif %}
+    </div>  
 
-    {% if current_user.is_authenticated %}
-    <!-- Logged in User View -->
+    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
 
-    <h1>Guess or be guessed</h1>
-    <p>Let others figure you out, or figure others out</p>
-    
-    <div>
-        <input type="text" id="newPostContent" placeholder="Enter new post content">
-        <input type="text" id="newPostHint" placeholder="Enter a hint">
+        <div class="filters-container" id="filtersContainer">
+            <h3>Filters</h3>
+            <label for="exactWordLengthFilter">Word Length:</label>
 
-        <div>
+            <select id="exactWordLengthFilter" onchange="updatePostsView()">
+                <option value="all">All Word Lengths</option>
+                <option value="1">1 character</option>
+                <option value="2">2 characters</option>
+                <option value="3">3 characters</option>
+                <option value="4">4 characters</option>
+                <option value="5">5 characters</option>
+                <option value="6">6 characters</option>
+                <option value="7">7 characters</option>
+                <option value="8">8 characters</option>
+                <option value="9">9 characters</option>
+                <option value="10">10 characters</option>
+                <option value="11">11 characters</option>
+                <option value="12">12 characters</option>
+                <option value="13+">More than 12 characters</option>
+            </select>
+
+            <select id="filterLanguage" onchange="updatePostsView()">
+                <option value="all">All Languages</option>
+                <option value="English">English</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Russian">Russian</option>
+                <option value="Filipino">Filipino</option>
+                <option value="Japanese">Japanese</option>
+            </select>
+
+            <select id="sortOption" onchange="updatePostsView()">
+                <option value="recent">Sort by Recent</option>
+                <option value="clicks">Sort by Likes</option>
+                <option value="random">Sort Randomly</option>
+                <option value="wrongAttempts">Sort by Wrong Attempts</option>
+            </select>
+
+            <input type="text" id="searchInput" placeholder="Search by hint">
+            <button onclick="searchPosts()">Search</button>
+
+            <select id="itemsPerPage" onchange="updatePostsView()">
+                <option value="10">10 items per page</option>
+                <option value="20">20 items per page</option>
+                <option value="50">50 items per page</option>
+                <option value="100">100 items per page</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="container mt-5" id="container">
+        {% if current_user.is_authenticated %}
+        <!-- Logged in User View -->
+
+        <h1>Write your riddle!</h1>
+        <p>How tos:</p>
+        <p>Enter the riddle or question!</p>
+        <p>Add Pictures for More Depth!</p>
+        <p>Create your very own riddle and let others solve it!</p>
+        <p>Enter the answer so that we know what you genius mind had came up with!</p>
+        
+        <input type="text" id="newPostHint" placeholder="Enter the Riddle">
+        <input type="text" id="newPostContent" placeholder="Enter the answer">
+
+        <div is="postcontainer">
             <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
-            <button onclick="Refresh()">Add Post</button>
-
+            <button onclick="Post()">Add Post</button>
+            <button onclick="Refresh()">Refresh to create new post</button>
             <div id="photoPreviewContainer" style="width: 100%; min-height: 100px; border: 1px solid #ccc; margin-top: 20px; padding: 10px;">
                 <ul id="sortablePhotoList" style="list-style-type: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;"></ul>
             </div>
-            <input type="file" id="photoUpload" multiple accept="image/*">
         </div>
 
         <select id="postLanguage">
@@ -86,31 +213,18 @@
             <option value="Filipino">Filipino</option>
             <option value="Japanese">Japanese</option>
         </select>
-        <button onclick="addPost()">Add Post</button>
+        <div class="mb-4">
+            <a href="{{ url_for('index') }}" class="button">Go back</a>
+        </div>
     </div>
     
-    <div class="tabs">
-        <button class="tab-button" onclick="showTab('active')">Active Posts</button>
-        <button class="tab-button" onclick="showTab('completed')">Completed Posts</button>
-    </div>
-    <div class="mb-4">
-        <a href="{{ url_for('index') }}" class="button">Go back</a>
-    </div>
+
+
     {% else %}
-    <!-- Unlogged in User View -->
-        <div class="container mt-5">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="alert alert-info" role="alert">
-                        {% for message in messages %}
-                            {{ message }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
-        </div>
-        <p>Please log in to view the forum.</p>
+        <p>Please Log in</p>
     {% endif %}
+
+
 
 
     <script src="static/js/script.js"></script>
