@@ -128,6 +128,52 @@ def add_post():
     flash('Post added!', 'success')
     return jsonify({ "result": score.to_dict() })
 
+# get_posts, get post based on filters
+# @param word_length, length of the word
+# @param language, source language of the hint, default is english
+# @param hint, hint to the guessing game
+# @param status, status of the post
+# @param page_no, page number
+# @param page_size, number of posts per page
+# @param order, order of the posts, default is descending order
+@app.route('/get_posts', methods=['GET'])
+@login_required
+def get_posts():
+    word_length = request.args.get('word_length', type=int)
+    language = request.args.get('language', type=str)
+    hint = request.args.get('hint', type=str)
+    status = request.args.get('status') == 'true'
+    page_no = request.args.get('page_no', 1, type=int)
+    page_size = request.args.get('page_size', 10, type=int)
+    order = request.args.get("order", 'desc')   
+    order_method = getattr(Post.datetime, order)
+    
+    # Base query
+    query = db.session.query(Post)
+
+    # Filters
+    if word_length:
+        query = query.filter(func.length(Post.content) == word_length)
+    if language:
+        query = query.filter_by(language=language)
+    if hint:
+        query = query.filter(Post.hint.like(f"%{hint}%"))
+    if status:
+        query = query.filter_by(status=status)
+    if order:
+        query = query.order_by(order_method())
+
+    # Pagination
+    postQuerys = query.paginate(page=page_no, per_page=page_size, error_out=False)
+    posts = [post.to_dict() for post in postQuerys.items]
+
+    flash('Posts get!', 'success')
+    # Return results
+    return jsonify({
+        'posts': posts,
+        'total': postQuerys.total
+    })
+
 # update_post, update an existing post
 # @param post_id the ID of the post to update
 # @param content new content for the post
