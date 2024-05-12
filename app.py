@@ -2,22 +2,32 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_session import Session
 from flask_socketio import SocketIO
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
-from database.models import db, User, Score, Post, Comment
+from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Unauthorized
+from database.models import db, User, Score, Post, Comment, Image
 from datetime import datetime
 import sqlite3
 import random
 import traceback
+import base64
+import os
+import mimetypes
+from io import BytesIO
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['UPLOADED_IMAGES_DEST'] = 'images'
+
 Session(app)
 socketio = SocketIO(app)
 db.init_app(app)
+images = UploadSet('images', IMAGES)
+configure_uploads(app, images)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -120,13 +130,33 @@ def add_post():
     if not _user_id or not _content or not _hint:
         return jsonify({'message': 'Missing parameters'}), 400
     _language = request.form["language"] or 'en'
+    _images = request.form.getlist("images[]")  # getlist to handle multiple files
 
-    score = Post(user_id=_user_id, content=_content, hint=_hint, language=_language)
-    db.session.add(score)
+    post = Post(user_id=_user_id, content=_content, hint=_hint, language=_language)
+    db.session.add(post)
+    db.session.flush()  # Flush to obtain the post ID for image foreign key
+    for index, image_str in enumerate(_images):
+        if image_str:
+            header, encoded = image_str.split(',', 1)
+            # Extract MIME type
+            mime_type = header.split(';')[0].split(':')[1]
+            # Use mimetypes to get the extension
+            extension = mimetypes.guess_extension(mime_type)
+            # Decode the image
+            image_bytes = base64.b64decode(encoded)
+            filename = secure_filename(f"{post.id}-{index}{extension}")
+            file_path = os.path.join(app.config['UPLOADED_IMAGES_DEST'], filename)
+
+            # Save the image to a file
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            # Save the image path to the database
+            new_image = Image(post_id=post.id, url=filename)
+            db.session.add(new_image)
     db.session.commit()
 
     flash('Post added!', 'success')
-    return jsonify({ "result": score.to_dict() })
+    return jsonify({ "result": post.to_dict() })
 
 # get_posts, get post based on filters
 # @param word_length, length of the word
