@@ -19,16 +19,28 @@
             <button onclick="addPost()" class="btn btn-primary">addPost('apple')</button>
             <button onclick="addComment('banana')" class="btn btn-primary">addComment('banana')</button>
             <button onclick="addComment('apple')" class="btn btn-primary">addComment('apple')</button>
+            <button onclick="updatePost('banana')" class="btn btn-primary">updatePost('banana')</button>
+            <button onclick="getPosts()" class="btn btn-primary">getPosts()</button>
+            <button onclick="deletePost('1')" class="btn btn-primary">deletePost('1')</button>
         </div>
     </div>
 </div>
 
 <script>
+    function getPosts(content) {
+        $.get('/get_posts', {language: 'es', hint: 'como', order: 'desc', status: false});
+    }
     function addPost() {
         $.post('/add_post', {user_id: 1, content: 'apple', hint: 'Como se dese la manzana in English?', language: 'es'});
     }
     function addComment(content) {
         $.post('/add_comment', {user_id: 1, post_id: 1, content: content});
+    }
+    function updatePost(content) {
+        $.post(`/update_post/1`, {content: content});
+    }
+    function deletePost(content) {
+        $.post(`/delete_post/${content}`);
     }
 </script>
 
