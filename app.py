@@ -128,6 +128,49 @@ def add_post():
     flash('Post added!', 'success')
     return jsonify({ "result": score.to_dict() })
 
+# update_post, update an existing post
+# @param post_id the ID of the post to update
+# @param content new content for the post
+# @param hint new hint for the guessing game
+# @param language new source language of the hint
+@app.route('/update_post/<int:post_id>', methods=['POST'])
+@login_required
+def update_post(post_id):
+    _post = Post.query.get(post_id)
+    if not _post:
+        return jsonify({'message': 'Post not found'}), 404
+    
+    _content = request.form.get("content")
+    _hint = request.form.get("hint")
+    _language = request.form.get("language")
+
+    if _content:
+        _post.content = _content
+    if _hint:
+        _post.hint = _hint
+    if _language:
+        _post.language = _language
+
+    db.session.commit()
+
+    flash('Post updated!', 'success')
+    return jsonify({ "result": _post.to_dict() })
+
+# delete_post, delete an existing post
+# @param post_id the ID of the post to delete
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    _post = Post.query.get(post_id)
+    if not _post:
+        return jsonify({'message': 'Post not found'}), 404
+
+    db.session.delete(_post)
+    db.session.commit()
+
+    flash('Post deleted!', 'success')
+    return jsonify({'message': 'Post successfully deleted'})
+    
 # add_comment, create a comment to a post
 # @param post_id which post the comment belongs to
 # @param content post content
