@@ -63,9 +63,16 @@ class Post(Model):
     language = Column(String(10), nullable=False, default='en')
     status = Column(Boolean, nullable=False, default=False) # false: active, true: completed
     comments = relationship('Comment', backref='post', lazy=True) # one to many, this will add a post attribute to the comment class
+    images = relationship('Image', backref='post', lazy=True)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+class Image(db.Model):
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('post.id'))
+    url = Column(String(255), nullable=False)
+
 class Comment(Model):
     id = Column(Integer, primary_key=True)
     post_id = Column(Integer, ForeignKey('post.id'))
