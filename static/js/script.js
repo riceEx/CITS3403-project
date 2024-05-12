@@ -346,10 +346,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function Post() {
-    addPost();
+function Posted() {
     alert('Post Uploaded! GO to Home to Check!');
-    location.reload();
+    location.reload(); 
+    addPost();
 }
 
 function addPost() {
@@ -357,7 +357,7 @@ function addPost() {
     const hint = document.getElementById('newPostHint').value;
     const languageSelect = document.getElementById('postLanguage');
     const language = languageSelect.options[languageSelect.selectedIndex].value;
-    //const postId = posts.length + 1; // Clculate next post ID based on the array length
+    const postId = posts.length + 1; // Clculate next post ID based on the array length
 
     if (!content) {
         alert('Please enter some content to add a post.');
@@ -389,8 +389,7 @@ function addPost() {
     // Clear the temporary storage for this post ID to prevent duplication
     delete uploadedPhotos[postId];
     sessionStorage.setItem('uploadedPhotos', JSON.stringify(uploadedPhotos));
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    $.post('/add_post', {content: content, hint: hint, language: language, images: photos});
+
 }
 
 
