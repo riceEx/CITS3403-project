@@ -46,23 +46,53 @@
         .pagination button {
             margin-right: 5px;
         }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #afafaf;
+            color: rgb(40, 40, 40);
+            padding: 10px 15px;
+            text-align: center;
+            z-index: 9999;
+            }
+        .container1 {
+            width: 100%; 
+            max-width: 1000px; 
+            padding: 50px; 
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            display: flex;
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 18px; 
+            margin-top: 50px;
+        }
     </style>
+    <div class="header">
+        <h1>Riddle's RabbitHole</h1>  
+    </div>
 </head>
 <body>
-<div class="sidebar" id="sidebar">
+    <div class="sidebar" id="sidebar">
     <div class="login-tab" id="loginButton" onclick="toggleLogin()">
         {% if current_user.is_authenticated %}
-            {{ current_user.username }} | <button onclick="logout()">Logout</button>
+            <br><br><br> 
+            {{ current_user.username }}
+
         {% else %}
             Login
         {% endif %}
-        </div>
+    </div>
     <div class="login-container" id="loginContainer">
         {% if current_user.is_authenticated %}
             
         {% else %}
             <h3>Login</h3>
-            <form id="loginForm" method="POST" action="/login">
+            <form id="loginForm" method="POST" action="/create">
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" placeholder="Enter username" required>
@@ -75,67 +105,68 @@
             </form>
             <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
         {% endif %}
-    </div>
+    </div>  
 
-    
-            
     <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
-    <div class="filters-container" id="filtersContainer">
-        <h3>Filters</h3>
-        <label for="exactWordLengthFilter">Word Length:</label>
-    <select id="exactWordLengthFilter" onchange="updatePostsView()">
-        <option value="all">All Word Lengths</option>
-        <option value="1">1 character</option>
-        <option value="2">2 characters</option>
-        <option value="3">3 characters</option>
-        <option value="4">4 characters</option>
-        <option value="5">5 characters</option>
-        <option value="6">6 characters</option>
-        <option value="7">7 characters</option>
-        <option value="8">8 characters</option>
-        <option value="9">9 characters</option>
-        <option value="10">10 characters</option>
-        <option value="11">11 characters</option>
-        <option value="12">12 characters</option>
-        <option value="13+">More than 12 characters</option>
-    </select>
 
+        <div class="filters-container" id="filtersContainer">
+            <h3>Filters</h3>
+            <label for="exactWordLengthFilter">Word Length:</label>
 
-    <select id="filterLanguage" onchange="updatePostsView()">
-        <option value="all">All Languages</option>
-        <option value="English">English</option>
-        <option value="Chinese">Chinese</option>
-        <option value="Russian">Russian</option>
-        <option value="Filipino">Filipino</option>
-        <option value="Japanese">Japanese</option>
-    </select>
+            <select id="exactWordLengthFilter" onchange="updatePostsView()">
+                <option value="all">All Word Lengths</option>
+                <option value="1">1 character</option>
+                <option value="2">2 characters</option>
+                <option value="3">3 characters</option>
+                <option value="4">4 characters</option>
+                <option value="5">5 characters</option>
+                <option value="6">6 characters</option>
+                <option value="7">7 characters</option>
+                <option value="8">8 characters</option>
+                <option value="9">9 characters</option>
+                <option value="10">10 characters</option>
+                <option value="11">11 characters</option>
+                <option value="12">12 characters</option>
+                <option value="13+">More than 12 characters</option>
+            </select>
 
-    <select id="sortOption" onchange="updatePostsView()">
-        <option value="recent">Sort by Recent</option>
-        <option value="clicks">Sort by Likes</option>
-        <option value="random">Sort Randomly</option>
-        <option value="wrongAttempts">Sort by Wrong Attempts</option>
-    </select>
+            <select id="filterLanguage" onchange="updatePostsView()">
+                <option value="all">All Languages</option>
+                <option value="English">English</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Russian">Russian</option>
+                <option value="Filipino">Filipino</option>
+                <option value="Japanese">Japanese</option>
+            </select>
 
-    <input type="text" id="searchInput" placeholder="Search by hint">
-    <button onclick="searchPosts()">Search</button>
+            <select id="sortOption" onchange="updatePostsView()">
+                <option value="recent">Sort by Recent</option>
+                <option value="clicks">Sort by Likes</option>
+                <option value="random">Sort Randomly</option>
+                <option value="wrongAttempts">Sort by Wrong Attempts</option>
+            </select>
 
-    <select id="itemsPerPage" onchange="updatePostsView()">
-        <option value="10">10 items per page</option>
-        <option value="20">20 items per page</option>
-        <option value="50">50 items per page</option>
-        <option value="100">100 items per page</option>
-    </select>
+            <input type="text" id="searchInput" placeholder="Search by hint">
+            <button onclick="searchPosts()">Search</button>
+
+            <select id="itemsPerPage" onchange="updatePostsView()">
+                <option value="10">10 items per page</option>
+                <option value="20">20 items per page</option>
+                <option value="50">50 items per page</option>
+                <option value="100">100 items per page</option>
+            </select>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <button onclick="logout()">Logout</button>
     </div>
-</div>
 
 
 
-<div class="container mt-5" style="margin-left: 120px;">
+<div class="container mt-5" id = "container1">
 
     {% if current_user.is_authenticated %}
     <!-- Logged in User View -->
-
+    <br><br>
     <div class="mb-4">
         <a href="{{ url_for('leaderboard') }}" class="btn btn-primary">View Leaderboard</a>
     </div>

@@ -103,6 +103,7 @@ function checkSidebarExpansion() {
     const loginVisible = document.getElementById('loginContainer').classList.contains('show');
     const sidebar = document.getElementById('sidebar');
 
+
     if (filtersVisible || loginVisible) {
         sidebar.classList.add('expanded');
     } else {
