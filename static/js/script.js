@@ -348,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function Posted() {
-    alert('Post Uploaded! GO to Home to Check!');
     location.reload(); 
     addPost();
 }
@@ -363,7 +362,10 @@ function addPost() {
     if (!content) {
         alert('Please enter some content to add a post.');
         return;
-    }
+    } else{
+        alert('Post Uploaded! GO to Home to Check!');
+        }
+    
 
     // Retrieve the images associated with this post from sessionStorage
     const uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};

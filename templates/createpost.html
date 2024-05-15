@@ -52,7 +52,9 @@
                 align-items: center;
                 min-height: 100vh; 
                 background-color: #ffffff; 
-                
+                background-image: url('images/rabbitbackground.jpg');
+                background-size: cover; 
+                background-position: center center;
             }
             #newPostHint {
                 width: 100%;
@@ -74,6 +76,9 @@
                 justify-content: center; 
                 align-items: center; 
                 font-size: 18px; 
+                background-image: url('rabbitbackground.png');
+                background-size: cover; 
+                background-position: center center;
             }
             @media only screen and (max-width: 600px) {
             #container {
@@ -116,7 +121,7 @@
             }
             .newbutton {
                 display: inline-block;
-                padding: 10px 20px;
+                padding: 5px 10px;
                 font-size: 16px;
                 font-weight: bold;
                 color: #fff;
@@ -144,6 +149,31 @@
                 display: inline-block;
                 font-size: 11;
             }
+            .lognew {
+                display: inline-block;
+                font-size: 11;
+                padding: 4px 3px;
+                border-radius: 5px;
+                border: none;
+                color: #fff;
+                background-color: #696969;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .lognew:hover {
+                background-color: #dfdfdf;
+                color: black;
+            }
+
+            .lognew:active {
+                transform: scale(0.98);
+            }
+
+            .lognew:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(206, 206, 206, 0.4);
+            }
         </style>
         <div class="header">
             <h1>Riddle's RabbitHole</h1>
@@ -159,7 +189,7 @@
             <br><br><br> 
             {{ current_user.username }}
             <br><br>
-            <button class="logoutnew" onclick="logout()">Logout</button>
+            <button class="lognew" onclick="logout()">Logout</button>
         {% else %}
             <br><br><br> 
             Login
@@ -179,7 +209,7 @@
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
-                <button class="newbutton" type="submit">Login</button>
+                <button class="lognew" type="submit">Login</button>
             </form>
             <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
         {% endif %}
