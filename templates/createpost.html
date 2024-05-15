@@ -43,7 +43,7 @@
             }
             .pagination button {
                 margin-right: 5px;
-            }            
+            }
             body {
                 margin: 0;
                 padding: 0;
@@ -114,6 +114,36 @@
                 text-align: center;
                 z-index: 9999;
             }
+            .newbutton {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                color: #fff;
+                background-color: #007BFF;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .newbutton:hover {
+                background-color: #0056b3;
+            }
+
+            .newbutton:active {
+                transform: scale(0.98);
+            }
+
+            .new button:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
+            }
+            .logoutnew {
+                display: inline-block;
+                font-size: 11;
+            }
         </style>
         <div class="header">
             <h1>Riddle's RabbitHole</h1>
@@ -128,8 +158,10 @@
         {% if current_user.is_authenticated %}
             <br><br><br> 
             {{ current_user.username }}
-
+            <br><br>
+            <button class="logoutnew" onclick="logout()">Logout</button>
         {% else %}
+            <br><br><br> 
             Login
         {% endif %}
     </div>
@@ -138,7 +170,7 @@
             
         {% else %}
             <h3>Login</h3>
-            <form id="loginForm" method="POST" action="/create">
+            <form id="loginForm" method="POST" action="/login">
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" placeholder="Enter username" required>
@@ -147,63 +179,14 @@
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
-                <button type="submit">Login</button>
+                <button class="newbutton" type="submit">Login</button>
             </form>
             <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
         {% endif %}
     </div>  
 
-    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
-
-        <div class="filters-container" id="filtersContainer">
-            <h3>Filters</h3>
-            <label for="exactWordLengthFilter">Word Length:</label>
-
-            <select id="exactWordLengthFilter" onchange="updatePostsView()">
-                <option value="all">All Word Lengths</option>
-                <option value="1">1 character</option>
-                <option value="2">2 characters</option>
-                <option value="3">3 characters</option>
-                <option value="4">4 characters</option>
-                <option value="5">5 characters</option>
-                <option value="6">6 characters</option>
-                <option value="7">7 characters</option>
-                <option value="8">8 characters</option>
-                <option value="9">9 characters</option>
-                <option value="10">10 characters</option>
-                <option value="11">11 characters</option>
-                <option value="12">12 characters</option>
-                <option value="13+">More than 12 characters</option>
-            </select>
-
-            <select id="filterLanguage" onchange="updatePostsView()">
-                <option value="all">All Languages</option>
-                <option value="English">English</option>
-                <option value="Chinese">Chinese</option>
-                <option value="Russian">Russian</option>
-                <option value="Filipino">Filipino</option>
-                <option value="Japanese">Japanese</option>
-            </select>
-
-            <select id="sortOption" onchange="updatePostsView()">
-                <option value="recent">Sort by Recent</option>
-                <option value="clicks">Sort by Likes</option>
-                <option value="random">Sort Randomly</option>
-                <option value="wrongAttempts">Sort by Wrong Attempts</option>
-            </select>
-
-            <input type="text" id="searchInput" placeholder="Search by hint">
-            <button onclick="searchPosts()">Search</button>
-
-            <select id="itemsPerPage" onchange="updatePostsView()">
-                <option value="10">10 items per page</option>
-                <option value="20">20 items per page</option>
-                <option value="50">50 items per page</option>
-                <option value="100">100 items per page</option>
-            </select>
-        </div>
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-        <button onclick="logout()">Logout</button>
+    
+        
     </div>
 
     <div class="container mt-5" id="container">
@@ -222,8 +205,8 @@
 
         <div is="postcontainer">
             <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
-            <button onclick="Posted()">Add Post</button>
-            <button onclick="addPostImageTest()">Add image to server</button>
+            <button class="newbutton" onclick="Posted()">Add Post</button>
+            <button class="newbutton" onclick="addPostImageTest()">Add image to server</button>
             <div id="photoPreviewContainer" style="width: 100%; min-height: 100px; border: 1px solid #ccc; margin-top: 20px; padding: 10px;">
                 <ul id="sortablePhotoList" style="list-style-type: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;"></ul>
             </div>
