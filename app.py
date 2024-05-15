@@ -283,12 +283,16 @@ def check_game(user_id: int, post_id: int, content: str):
     post = db.session.execute(db.select(Post).filter_by(id=post_id)).scalar_one_or_none()
     _answer = post.content
     if (_answer == content):
+        # 1. basic points based on the length of the word
+        # 2. if the post has not been completed before, double the points
+        score = len(post.content)
+        if (post.status == False):
+            score *= 2
         # update post status to completed
         post.status = True
-        flash('Post status updated!', 'success')
 
-        #TODO add_score to user, currently just add 1
-        add_score(user_id, score = 1)
+        flash('Post status updated!', 'success')
+        add_score(user_id, score)
 
 # TODO add_like
 # @app.route('/add_like', methods=['POST'])
