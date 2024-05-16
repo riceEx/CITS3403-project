@@ -13,7 +13,7 @@
         .sidebar {
             position: fixed;
             top: 0;
-            left: 0;
+            left:0;
             width: 80px;
             height: 100%;
             overflow-y: auto;
@@ -56,7 +56,14 @@
             padding: 10px 15px;
             text-align: center;
             z-index: 9999;
-            }
+        }
+        .rabbitimg {
+            vertical-align: right;
+            height: auto;
+            width: auto; 
+            margin-left: 5px;
+            size-adjust: 30%;
+        }
         .container1 {
             width: 100%; 
             max-width: 1000px; 
@@ -74,71 +81,54 @@
         }
         .body {
             background-image: url('rabbitbackground.png');
-            background-size: cover;
+            background-size: auto;
             background-repeat: no-repeat;
             background-position: center center;
         }
-        .newbutton {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .newbutton:hover {
-            background-color: #0056b3;
-        }
 
-        .newbutton:active {
-            transform: scale(0.98);
+        
+        .button-container {
+            display: flex;
+            gap: 10px; 
+            align-items: center;
+            justify-content: center;
+            margin-right: 30px;
         }
-
-        .newbutton:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
+        .bigger-button-container{
+            width: 100%;
+            background-color: rgb(255, 235, 163);
+            margin-left: 20px;
+            padding-top: 1px;
+            padding-bottom: 6px;
         }
-        .lognew {
-            display: inline-block;
-            font-size: 11;
-            padding: 4px 3px;
-            border-radius: 5px;
-            border: none;
-            color: #fff;
-            background-color: #696969;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .lognew:hover {
-            background-color: #dfdfdf;
-            color: black;
-        }
-
-        .lognew:active {
-            transform: scale(0.98);
-        }
-
-        .lognew:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(206, 206, 206, 0.4);
-        }
-
+        
     </style>
 </head>
 <body>
+
     <div class="header">
-        <h1>Riddle's RabbitHole</h1>  
+        <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1>   
     </div>
+    <br>
+    <div class="bigger-button-container">
+        <p></p>
+        <br>
+        {% if current_user.is_authenticated %}
+        <div class="button-container">
+            <a href="{{ url_for('leaderboard') }}" class="newbutton" >View Leaderboard</a>  
+            <a href="{{ url_for('createpost') }}" class="newbutton" >Create Posts!</a>
+
+        </div>
+        {% else %}
+
+        {% endif %} 
+    </div>
+
     <div class="sidebar" id="sidebar">
     
     <div class="login-tab" id="loginButton" onclick="toggleLogin()">
         {% if current_user.is_authenticated %}
-            <br><br><br> 
+            <br><br><br>
             Hello 
             {{ current_user.username }}!
             <br><br>
@@ -221,31 +211,21 @@
         
     </div>
 
-
-
 <div class="container mt-5" id = "container1">
 
     {% if current_user.is_authenticated %}
     <!-- Logged in User View -->
-    <br><br>
-    <div class="mb-4">
-        <a href="{{ url_for('leaderboard') }}" class="btn btn-primary">View Leaderboard</a>
-    </div>
-    <div class="mb-4">
-        <a href="{{ url_for('createpost') }}" class="btn btn-primary">Create Posts!</a>
-    </div>
 
-    
     <div class="tabs">
         <button class="newbutton" class="tab-button" onclick="showTab('active')">Active Posts</button>
         <button class="newbutton" class="tab-button" onclick="showTab('completed')">Completed Posts</button>
     </div>
 
     <div id="postsContainer">
-        <h2>Active Posts</h2>
+        <h2>Uncleared Riddles</h2>
     </div>
     <div id="completedPostsContainer" style="display:none;">
-        <h2>Completed Posts</h2>
+        <h2>Cleared Riddles</h2>
     </div>
 
     <div class="pagination" id="pagination">

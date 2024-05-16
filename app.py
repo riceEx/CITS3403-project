@@ -104,6 +104,20 @@ def login():
         flash('Incorrect username or password', 'error')
         return redirect(url_for('index'))
 
+#specific for leaderboard so it doesnt take you to index if you logout
+@app.route('/loginL', methods=['POST'])
+def loginL():
+    username = request.form['username']
+    password = request.form['password']
+
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.check_password(password):
+        login_user(user)
+        return redirect(url_for('leaderboard'))
+    else:
+        flash('Incorrect username or password', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/logout', methods=['POST'])
 @login_required

@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Leaderboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-image: url('rabbitbackgound.png');
@@ -16,9 +18,10 @@
             background-attachment: fixed; 
             height: 100vh;
         }
-        .container {
+        .containerl {
             max-width: 800px;
             margin: 20px auto;
+            text-align: center;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
@@ -26,7 +29,7 @@
         }
         h1 {
             text-align: center;
-            color: #333;
+            color: #262626;
         }
         table {
             width: 100%;
@@ -46,26 +49,21 @@
         tr:hover {
             background-color: #f2f2f2;
         }
-        .button {
-            display: block;
-            text-align: center;
-            width: 100px;
-            margin: 20px auto;
-            padding: 10px;
-            background-color: #8b8b8b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #000000;
-        }
+
+
     </style>
 </head>
 <body>
+    
 
-<div class="container">
+
+    <div class="header">
+        <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1> 
+    </div>
+    
+
+<div class="containerl">
+    <br><br><br>
     <h1>Leaderboard</h1>
     <table id="leaderboard">
         <thead>
@@ -85,12 +83,16 @@
             {% endfor %}
         </tbody>
     </table>
+    <br>
     <div class="mb-4">
-        <a href="{{ url_for('index') }}" class="button">Go back</a>
+        <a href="{{ url_for('index') }}" class="newbutton">Go back</a>
     </div>
 </div>
 <script>
 //requires functions to make it so that the one with the higer score gets updated all the time
+
+
 </script>
+<script src="static/js/script.js"></script>
 </body>
 </html>
