@@ -23,6 +23,9 @@
             .expanded {
                 width: 300px;
             }
+            .hideword{
+                display: none;
+            }
             .filters-container, .login-container {
                 display: none;
                 margin-top: 20px;
@@ -37,12 +40,6 @@
             .filters-container select {
                 width: 100%;
                 margin-bottom: 10px;
-            }
-            .pagination {
-                margin-top: 20px;
-            }
-            .pagination button {
-                margin-right: 5px;
             }
             body {
                 margin: 0;
@@ -123,9 +120,11 @@
     <div class="login-tab" id="loginButton" onclick="toggleLogin()">
         {% if current_user.is_authenticated %}
             <br><br><br> 
-            {{ current_user.username }}
+            Hello
+            {{ current_user.username }}!
             <br><br>
             <button class="lognew" onclick="logout()">Logout</button>
+            <br>
         {% else %}
             <br><br><br> 
             Login
@@ -149,6 +148,31 @@
             </form>
             <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
         {% endif %}
+    </div>
+        <!-- Placeholder so that the sidebar can extend. It uses the filter functions to extend -->
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p1 class="hideword">Invisible word</p1>{% else %}{% endif %}</div>
+    
+        <div class="filters-container" id="filtersContainer">
+            <h3>Invisibale word</h3>
+            <label for="exactWordLengthFilter">Word Length:</label>
+
+            <select id="exactWordLengthFilter" onchange="updatePostsView()">
+                <option value="all">All Word Lengths</option>
+                <option value="1">1 character</option>
+                <option value="2">2 characters</option>
+                <option value="3">3 characters</option>
+                <option value="4">4 characters</option>
+                <option value="5">5 characters</option>
+                <option value="6">6 characters</option>
+                <option value="7">7 characters</option>
+                <option value="8">8 characters</option>
+                <option value="9">9 characters</option>
+                <option value="10">10 characters</option>
+                <option value="11">11 characters</option>
+                <option value="12">12 characters</option>
+                <option value="13+">More than 12 characters</option>
+            </select>
+        </div>
     </div>  
 
     

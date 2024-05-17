@@ -7,6 +7,39 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Leaderboard</title>
     <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left:0;
+            width: 80px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: width 0.3s ease-in-out;
+        }
+        .expanded {
+            width: 300px;
+        }
+        .hideword{
+            display: none;
+        }
+        .filters-container, .login-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .filters-container.show, .login-container.show {
+            display: block;
+        }
+        .filters-container label, .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .filters-container select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -54,13 +87,69 @@
     </style>
 </head>
 <body>
-    
-
 
     <div class="header">
         <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1> 
     </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="login-tab" id="loginButton" onclick="toggleLogin()">
+            {% if current_user.is_authenticated %}
+                <br><br><br>
+                Hello 
+                {{ current_user.username }}!
+                <br><br>
+                <button class="lognew" onclick="logout()">Logout</button>
+            {% else %}
+                <br><br><br> 
+                Login
+            {% endif %}
+        </div>
+        <div class="login-container" id="loginContainer">
+            {% if current_user.is_authenticated %}
+                
+            {% else %}
+                <h3>Login</h3>
+                <form id="loginForm" method="POST" action="/login">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="lognew">Login</button>
+                </form>
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+            {% endif %}
+        </div>  
+            <!-- Placeholder so that the sidebar can extend. It uses the filter functions to extend -->
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p1 class="hideword">Invisible word</p1>{% else %}{% endif %}</div>
     
+        <div class="filters-container" id="filtersContainer">
+            <h3>Invisibale word</h3>
+            <label for="exactWordLengthFilter">Word Length:</label>
+
+            <select id="exactWordLengthFilter" onchange="updatePostsView()">
+                <option value="all">All Word Lengths</option>
+                <option value="1">1 character</option>
+                <option value="2">2 characters</option>
+                <option value="3">3 characters</option>
+                <option value="4">4 characters</option>
+                <option value="5">5 characters</option>
+                <option value="6">6 characters</option>
+                <option value="7">7 characters</option>
+                <option value="8">8 characters</option>
+                <option value="9">9 characters</option>
+                <option value="10">10 characters</option>
+                <option value="11">11 characters</option>
+                <option value="12">12 characters</option>
+                <option value="13+">More than 12 characters</option>
+            </select>
+        </div>
+    </div>
+ 
 
 <div class="containerl">
     <br><br><br>
