@@ -21,7 +21,7 @@ app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['UPLOADED_IMAGES_DEST'] = 'images'
+app.config['UPLOADED_IMAGES_DEST'] = 'static/post_images'
 
 Session(app)
 socketio = SocketIO(app)
