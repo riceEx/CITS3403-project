@@ -66,8 +66,12 @@ class Post(Model):
     images = relationship('Image', backref='post', lazy=True)
 
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-    
+        post_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # Handling relationships
+        post_dict['comments'] = [comment.to_dict() for comment in self.comments]
+        post_dict['images'] = [image.url for image in self.images]
+        return post_dict
+
 class Image(db.Model):
     id = Column(Integer, primary_key=True)
     post_id = Column(Integer, ForeignKey('post.id'))

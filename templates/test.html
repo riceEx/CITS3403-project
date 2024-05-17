@@ -28,13 +28,13 @@
 
 <script>
     function getPosts(content) {
-        $.get('/get_posts', {language: 'es', hint: 'como', order: 'desc', status: false});
+        $.get('/get_posts');
     }
     function addPost() {
         $.post('/add_post', {user_id: 1, content: 'apple', hint: 'Como se dese la manzana in English?', language: 'es'});
     }
     function addComment(content) {
-        $.post('/add_comment', {user_id: 1, post_id: 1, content: content});
+        $.post('/add_comment', {post_id: 10, content: content});
     }
     function updatePost(content) {
         $.post(`/update_post/1`, {content: content});
