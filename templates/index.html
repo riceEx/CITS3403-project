@@ -6,7 +6,7 @@
     <title>Interactive Forum</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
     <style>
@@ -60,7 +60,6 @@
             color: #7C8363;
         }
         .rabbitimg {
-            vertical-align: right;
             height: 50px;
             width: auto; 
             margin-left: 5px;
@@ -112,7 +111,7 @@
 <body style="background-color: #EDf4F2">
 
     <div class="header">
-        <h1><b>Riddle's RabbitHole</b>  <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg">  </h1>
+        <h1><b>Riddle's RabbitHole</b>  <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg">  </h1>
     </div>
     <br>
     <div class="bigger-button-container">
@@ -135,7 +134,7 @@
             {% if current_user.is_authenticated %}
                 <br><br><br><b>
                 Hello 
-                {{ current_user.username }}!
+                {{ current_user.username }}!</b>
                 <br><br>
                 <button class="lognew" onclick="logout()">Logout</button>
                 <br>
@@ -164,10 +163,10 @@
             {% endif %}
         </div>  
 
-        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<b>Filters</b>{% else %}{% endif %}</div>
 
         <div class="filters-container" id="filtersContainer">
-            <h3>Filters</h3></b>
+            <h3><b>Filters</b></h3>
             <label for="exactWordLengthFilter">Word Length:</label>
 
             <select id="exactWordLengthFilter" onchange="updatePostsView()">
@@ -290,7 +289,7 @@
         </div>
         <p>Please log in to view the forum.</p>
     {% endif %}
-</div>
+
 
 
 

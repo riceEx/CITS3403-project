@@ -89,7 +89,7 @@
 <body style="background-color: #EDF4F2;">
 
     <div class="header">
-        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b><img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
+        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b><img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1> 
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -125,7 +125,7 @@
             {% endif %}
         </div>  
             <!-- Placeholder so that the sidebar can extend. It uses the filter functions to extend -->
-        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p1 class="hideword">Invisible word</p1>{% else %}{% endif %}</div>
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p class="hideword">Invisible word</p>{% else %}{% endif %}</div>
     
     </div>
  
@@ -177,18 +177,18 @@
                     <!-- Comment Row -->
                     {% for comment in comments %}
                         <div class="d-flex flex-row comment-row m-t-0">
-                            <div class="p-2"><img src="https://i.imgur.com/Ur43esv.jpg" alt="user" width="50" class="rounded-circle"></div>
+                            <div class="p-2"><img src="{{ url_for('static', filename='img/' + comment.avatar) }}" alt="?" width="50" class="rounded-circle"></div>
                             <div class="comment-text w-100">
-                                <h6 class="font-medium">{{ comment.user_id }}</h6> <span class="m-b-15 d-block">{{ comment.content }}</span>
+                                <h6 class="font-medium"><b>{{ comment.username }}</b></h6> <span class="m-b-15 d-block">{{ comment.content }}</span>
                                 <div class="comment-footer"> <span class="text-muted float-right">{{ comment.datetime }}</span> </div>
                             </div>
                         </div>
-                        <li>{{ comment.content }}</li>
                     {% endfor %}
                 </div> <!-- Card -->
                 <!-- New Comment Form -->
                 <div class="card-body">
                     <form id="commentForm" onsubmit="submitComment(event)">
+                        <input type="hidden" id="post_id" name="post_id" value="{{ post.id }}">
                         <div class="form-group">
                             <label for="comment">Add Comment</label>
                             <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
@@ -206,22 +206,19 @@
 
 <script>
     function submitAnswer(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
+        event.preventDefault();
         
-        // Get the answer value from the input field
         var answer = document.getElementById("answer").value;
 
-        // Send an asynchronous POST request to the server to check the answer
         fetch("/check-answer/{{ post.id }}", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded" // Change content type to x-www-form-urlencoded
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "answer=" + encodeURIComponent(answer) // Encode the answer parameter
+            body: "answer=" + encodeURIComponent(answer)
         })
         .then(response => response.json())
         .then(data => {
-            // Display the answer message on the page
             document.getElementById("answerMessage").innerText = data.message;
         })
         .catch(error => {
@@ -229,6 +226,30 @@
         });
     }
 
+    function submitComment(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('commentForm');
+        const formData = new FormData(form);
+        
+        fetch('/add_comment', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result) {
+                alert('Comment added successfully!');
+                location.reload();
+            } else {
+                alert('Error adding comment: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 
 
 

@@ -4,7 +4,6 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
-# Unpack SQLAlchemy classes into local variables
 Column, Integer, String, Boolean, DateTime, ForeignKey, Model, func, relationship = (
     db.Column, db.Integer, db.String, db.Boolean, db.DateTime, db.ForeignKey, db.Model, db.func, db.relationship
 )
@@ -19,6 +18,7 @@ class User(UserMixin, Model):
     country = Column(String(50), nullable=False)
     avatar = Column(String(20), nullable=False)
     score = Column(db.Integer, default=0)
+    comments = db.relationship('Comment', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

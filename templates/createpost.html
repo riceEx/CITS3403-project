@@ -1,120 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-        <title>CreatePost</title>
-        <style>
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 80px;
-                height: 100%;
-                overflow-y: auto;
-                padding: 20px;
-                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-                transition: width 0.3s ease-in-out;
-            }
-            .expanded {
-                width: 300px;
-            }
-            .hideword{
-                display: none;
-            }
-            .filters-container, .login-container {
-                display: none;
-                margin-top: 20px;
-            }
-            .filters-container.show, .login-container.show {
-                display: block;
-            }
-            .filters-container label, .login-container label {
-                display: block;
-                margin-bottom: 5px;
-            }
-            .filters-container select {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh; 
-                background-color: #ffffff; 
-                background-image: url('images/rabbitbackground.jpg');
-                background-size: cover; 
-                background-position: center center;
-            }
-            #newPostHint {
-                width: 100%;
-                padding: 10px; 
-            }
-            #newPostContent {
-                width: 40%;
-                padding: 10px; 
-            }            
-            .container {
-                width: 100%; 
-                max-width: 1000px; 
-                padding: 50px; 
-                background-color: white;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-                display: flex;
-                flex-direction: column; 
-                justify-content: center; 
-                align-items: center; 
-                font-size: 18px; 
-                background-image: url('rabbitbackground.png');
-                background-size: cover; 
-                background-position: center center;
-            }
-            @media only screen and (max-width: 600px) {
-            #container {
-                width: 90%; }
-            #body {
-                margin-left: auto;
-            }
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <title>CreatePost</title>
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: width 0.3s ease-in-out;
+        }
+        .expanded {
+            width: 300px;
+        }
+        .hideword{
+            display: none;
+        }
+        .filters-container, .login-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .filters-container.show, .login-container.show {
+            display: block;
+        }
+        .filters-container label, .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .filters-container select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            background-color: #ffffff; 
+            background-image: url('images/rabbitbackground.jpg');
+            background-size: cover; 
+            background-position: center center;
+        }
+        #newPostHint {
+            width: 100%;
+            padding: 10px; 
+        }
+        #newPostContent {
+            width: 40%;
+            padding: 10px; 
+        }            
+        .container {
+            width: 100%; 
+            max-width: 1000px; 
+            padding: 50px; 
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            display: flex;
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 18px; 
+            background-image: url('rabbitbackground.png');
+            background-size: cover; 
+            background-position: center center;
+        }
+        @media only screen and (max-width: 600px) {
+        #container {
+            width: 90%; }
+        #body {
+            margin-left: auto;
+        }
+        }
 
-            h1 {
-                text-align: center;
-                color: #333;
-            }
-            .button {
-                display: block;
-                text-align: center;
-                width: 100px;
-                margin: 20px auto;
-                padding: 10px;
-                background-color: #8b8b8b;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                
-            }
-            .button:hover {
-                background-color: #e1e1e1;
-            }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .button {
+            display: block;
+            text-align: center;
+            width: 100px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #8b8b8b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            
+        }
+        .button:hover {
+            background-color: #e1e1e1;
+        }
 
-        </style>
+    </style>
+</head>
 
-        <div class="header">
-            <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b> <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1>   
-        </div>
 
-    </head>    
 
-    <body style="background-color: #EDf4F2">       
+<body style="background-color: #EDf4F2">
+    <div class="header">
+        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b> <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1>   
+    </div>
 
     <div class="sidebar" id="sidebar">
     <div class="login-tab" id="loginButton" onclick="toggleLogin()">
@@ -149,8 +149,7 @@
             <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
         {% endif %}
     </div>
-        <!-- Placeholder so that the sidebar can extend. It uses the filter functions to extend -->
-        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p1 class="hideword">Invisible word</p1>{% else %}{% endif %}</div>
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p class="hideword">Invisible word</p>{% else %}{% endif %}</div>
     
         <div class="filters-container" id="filtersContainer">
             <h3>Invisibale word</h3>
@@ -175,14 +174,8 @@
         </div>
     </div>  
 
-    
-        
-    </div>
-
     <div class="container mt-5" id="container">
         {% if current_user.is_authenticated %}
-        <!-- Logged in User View -->
-
         <h1>Write your riddle!</h1>
         <p>How tos:</p>
         <p>Enter the riddle or question!</p>
@@ -193,7 +186,7 @@
         <input type="text" id="newPostHint" placeholder="Enter the Riddle">
         <input type="text" id="newPostContent" placeholder="Enter the answer">
 
-        <div is="postcontainer">
+        <div id="postcontainer">
             <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
             <button class="newbutton" onclick="Posted()">Add Post</button>
             <button class="newbutton" onclick="addPostImageTest()">Add image to server</button>

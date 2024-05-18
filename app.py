@@ -277,35 +277,35 @@ def delete_post(post_id):
     flash('Post deleted!', 'success')
     return jsonify({'message': 'Post successfully deleted'})
     
-# add_comment, create a comment to a post
-# @param post_id which post the comment belongs to
-# @param content post content
-@app.route('/add_comment', methods=['POST'])
-@login_required
-def add_comment():
-    _user_id = current_user.id
-    _post_id = request.form["post_id"]
-    _content = request.form["content"]
-    #if user_id, content or hint is not provided, return error
-    if not _user_id or not _content or not _post_id:
-        return jsonify({'message': 'Missing parameters'}), 400
+# # add_comment, create a comment to a post
+# # @param post_id which post the comment belongs to
+# # @param content post content
+# @app.route('/add_comment', methods=['POST'])
+# @login_required
+# def add_comment():
+#     _user_id = current_user.id
+#     _post_id = request.form["post_id"]
+#     _content = request.form["content"]
+#     #if user_id, content or hint is not provided, return error
+#     if not _user_id or not _content or not _post_id:
+#         return jsonify({'message': 'Missing parameters'}), 400
 
-    try:
-        # Begin a transaction of multiple operations
-        db.session.close()
-        with db.session.begin():
-            comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
-            db.session.add(comment)
-            check_game(_user_id, _post_id, _content)
-            db.session.commit()
-    except Exception as e:
-        traceback.print_exc()
-        # Roll back the transaction if any error occurs
-        db.session.rollback()
-        return jsonify({'message': 'An error has occurred, please submit again'}), 400
+#     try:
+#         # Begin a transaction of multiple operations
+#         db.session.close()
+#         with db.session.begin():
+#             comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
+#             db.session.add(comment)
+#             check_game(_user_id, _post_id, _content)
+#             db.session.commit()
+#     except Exception as e:
+#         traceback.print_exc()
+#         # Roll back the transaction if any error occurs
+#         db.session.rollback()
+#         return jsonify({'message': 'An error has occurred, please submit again'}), 400
 
-    flash('Comment added!', 'success')
-    return jsonify({ "result": comment.to_dict() })
+#     flash('Comment added!', 'success')
+#     return jsonify({ "result": comment.to_dict() })
 
 def check_game(user_id: int, post_id: int, content: str):
     post = db.session.execute(db.select(Post).filter_by(id=post_id)).scalar_one_or_none()
@@ -387,46 +387,73 @@ def get_scores():
 @app.route('/post-details/<int:post_id>')
 @login_required
 def post_details(post_id):
-    # Retrieve post details using the post_id
-    # Query all posts from the database
-    # Query the post with the specified post_id
     post = Post.query.filter_by(id=post_id).first()
-    # Pass post details to the template
     if post:
-        # Pass post details to the template
-        # Query comments associated with the post
         comments = Comment.query.filter_by(post_id=post_id).all()
-        return render_template('post.html', user=current_user, post=post, comments=comments)
+
+        comments_with_users = []
+        for comment in comments:
+            user = User.query.filter_by(id=comment.user_id).first()
+            comment_data = comment.to_dict()
+            comment_data['username'] = user.username
+            comment_data['avatar'] = user.avatar
+            comments_with_users.append(comment_data)
+        
+        return render_template('post.html', user=current_user, post=post, comments=comments_with_users)
     else:
-        # Handle the case where the post with the given ID does not exist
         flash('Post not found.', 'error')
         return redirect(url_for('index'))
 
 @app.route('/check-answer/<int:post_id>', methods=['POST'])
 @login_required
 def check_answer(post_id):
-    # Retrieve post details using the post_id
     post = Post.query.filter_by(id=post_id).first()
 
     if post:
-        # Get the submitted answer from the form
         submitted_answer = request.form.get('answer')
         print(submitted_answer)
         print(post.content)
 
-        # Check if the submitted answer is correct
         if submitted_answer == post.content:
-            # If correct, return a response indicating success
             post.status = True
+
+            score = Score.query.filter_by(user_id=current_user.id).first()
+
+            if not score:
+                score = Score(user_id=current_user.id, score=0)
+                db.session.add(score)
+
+            score.add_score(10)
+
             db.session.commit()
 
             return jsonify({'message': 'Correct!'})
         else:
-            # If incorrect, return a response indicating failure
             return jsonify({'message': 'Wrong!'})
     else:
-        # Handle the case where the post with the given ID does not exist
         return jsonify({'message': 'Post not found.'}), 404
+
+
+@app.route('/add_comment', methods=['POST'])
+@login_required
+def add_comment():
+    _user_id = current_user.id
+    _post_id = request.form["post_id"]
+    _content = request.form["comment"]
+    
+    if not _user_id or not _content or not _post_id:
+        return jsonify({'message': 'Missing parameters'}), 400
+
+    try:
+        comment = Comment(user_id=_user_id, post_id=_post_id, content=_content)
+        db.session.add(comment)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred, please try again'}), 400
+
+    return jsonify({"result": comment.to_dict()})
+
 
 
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
