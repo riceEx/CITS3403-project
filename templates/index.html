@@ -59,10 +59,9 @@
         }
         .rabbitimg {
             vertical-align: right;
-            height: auto;
+            height: 50px;
             width: auto; 
             margin-left: 5px;
-            size-adjust: 30%;
         }
         .container1 {
             width: 100%; 
@@ -101,13 +100,16 @@
             padding-top: 1px;
             padding-bottom: 6px;
         }
-        
+        .posts-container {
+            margin-top: 20px;
+            margin-left: 100px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1>   
+        <h1>Riddle's RabbitHole  <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg">  </h1>
     </div>
     <br>
     <div class="bigger-button-container">
@@ -126,40 +128,40 @@
 
     <div class="sidebar" id="sidebar">
     
-    <div class="login-tab" id="loginButton" onclick="toggleLogin()">
-        {% if current_user.is_authenticated %}
-            <br><br><br>
-            Hello 
-            {{ current_user.username }}!
-            <br><br>
-            <button class="lognew" onclick="logout()">Logout</button>
-            <br>
-        {% else %}
-            <br><br><br> 
-            Login
-        {% endif %}
-    </div>
-    <div class="login-container" id="loginContainer">
-        {% if current_user.is_authenticated %}
-            
-        {% else %}
-            <h3>Login</h3>
-            <form id="loginForm" method="POST" action="/login">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" placeholder="Enter username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" placeholder="Enter password" required>
-                </div>
-                <button type="submit" class="lognew">Login</button>
-            </form>
-            <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
-        {% endif %}
-    </div>  
+        <div class="login-tab" id="loginButton" onclick="toggleLogin()">
+            {% if current_user.is_authenticated %}
+                <br><br><br>
+                Hello 
+                {{ current_user.username }}!
+                <br><br>
+                <button class="lognew" onclick="logout()">Logout</button>
+                <br>
+            {% else %}
+                <br><br><br> 
+                Login
+            {% endif %}
+        </div>
+        <div class="login-container" id="loginContainer">
+            {% if current_user.is_authenticated %}
+                
+            {% else %}
+                <h3>Login</h3>
+                <form id="loginForm" method="POST" action="/login">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="lognew">Login</button>
+                </form>
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+            {% endif %}
+        </div>  
 
-    <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
 
         <div class="filters-container" id="filtersContainer">
             <h3>Filters</h3>
@@ -218,16 +220,53 @@
     <!-- Logged in User View -->
 
     <div class="tabs">
-        <button class="newbutton" class="tab-button" onclick="showTab('active')">Active Posts</button>
-        <button class="newbutton" class="tab-button" onclick="showTab('completed')">Completed Posts</button>
+        <button class="newbutton tab-button" onclick="showPosts('active')">Active Posts</button>
+        <button class="newbutton tab-button" onclick="showPosts('completed')">Completed Posts</button>
+    </div>
+    <br><br>
+</div>   
+    <div id="realPostsContainer" class="posts-container hidden">
+        <div class="container-fluid">
+            <div class="px-lg-5">
+                <div class="row">
+                {% for post in posts %}
+                <!-- Gallery item -->
+                    <!-- <div class="post"> -->
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                            <div class="bg-white rounded shadow-sm">
+                                {% if post.images %}
+                                <img src="{{ url_for('static', filename='post_images/' + post.images[0].url) }}" alt="Post Image" class="img-fluid card-img-top">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='post_images/default.jpg') }}" alt="Post Image123" class="img-fluid card-img-top">
+                                {% endif %}
+                                <div class="p-4">
+                                    <h5> <a href="#" class="text-dark">{{ post.content }}</a></h5>
+                                    <p class="small text-muted mb-0">{{ post.hint }}</p>
+                                    <div class="d-flex align-items-center justify-content-between rounded-pill bg-light px-3 py-2 mt-4">
+                                        <p class="small mb-0"><span class="font-weight-bold">{{ post.language }}</span></p>
+                                        <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-success{% else %}badge-danger{% endif %} px-3 rounded-pill font-weight-normal">
+                                            {% if post.status %}
+                                                Active
+                                            {% else %}
+                                                Complete
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="postsContainer">
+    <!-- <div id="postsContainer">
         <h2>Uncleared Riddles</h2>
     </div>
     <div id="completedPostsContainer" style="display:none;">
         <h2>Cleared Riddles</h2>
-    </div>
+    </div> -->
 
     <div class="pagination" id="pagination">
         <!-- Pagination buttons will be added here dynamically -->
@@ -264,6 +303,26 @@ function addPostImageTest() {
 
     $.post('/add_post', {content: 'apple', hint: '', language: 'es', images: photos});
 }
+
+    // Function to show posts based on status
+    function showPosts(status) {
+        var posts = document.getElementsByClassName('col-xl-3');
+        for (var i = 0; i < posts.length; i++) {
+            if (status === 'active') {
+                if (posts[i].querySelector('p[data-status]').dataset.status === 'True') {
+                    posts[i].style.display = 'block';
+                } else {
+                    posts[i].style.display = 'none';
+                }
+            } else if (status === 'completed') {
+                if (posts[i].querySelector('p[data-status]').dataset.status === 'False') {
+                    posts[i].style.display = 'block';
+                } else {
+                    posts[i].style.display = 'none';
+                }
+            }
+        }
+    }
 </script>
 
 

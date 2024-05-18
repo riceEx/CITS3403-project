@@ -89,7 +89,7 @@
 <body>
 
     <div class="header">
-        <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1> 
+        <h1>Riddle's RabbitHole <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -163,11 +163,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for user in users %}
+            {% for entry in data %}
             <tr>
-                <td class="rank"></td> <!-- placeholder for rank -->
-                <td>{{ users.username }}</td>
-                <td>{{ users.score }}</td>
+                <td>{{ entry.rank }}</td>
+                <td>{{ entry.username }}</td>
+                <td>{{ entry.score }}</td>
             </tr>
             {% endfor %}
         </tbody>

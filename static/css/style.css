@@ -215,6 +215,13 @@ body {
     }
 }
 
+.rabbitimg {
+    vertical-align: right;
+    height: 50px;
+    width: auto; 
+    margin-left: 5px;
+}
+
 .wrong-attempts {
     display: inline-block;
     background-color: #ffdddd; /* Red background */

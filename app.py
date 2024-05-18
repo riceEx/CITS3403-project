@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_session import Session
 from flask_socketio import SocketIO
-from flask_uploads import UploadSet, configure_uploads, IMAGES
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
@@ -40,7 +40,10 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', user=current_user)
+    # Query all posts from the database
+    posts = Post.query.all()
+    # Render the index.html template and pass the posts to it
+    return render_template('index.html', user=current_user, posts=posts)
 
 
 
@@ -50,7 +53,18 @@ def createpost():
  
 @app.route('/leaderboard')
 def leaderboard():
-    return render_template('leaderboard.html', user=current_user)
+    # Fetch top 10 scores in descending order
+    top_scores = Score.query.order_by(Score.score.desc()).limit(10).all()
+    
+    # Fetch corresponding user details
+    data = []
+    rank = 1
+    for score in top_scores:
+        user = User.query.get(score.user_id)
+        data.append({"rank": rank, "username": user.username, "score": score.score})
+        rank += 1
+
+    return render_template('leaderboard.html', data=data, current_user=current_user)
 
 
 @app.route('/register', methods=['GET', 'POST'])
