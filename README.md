@@ -1,3 +1,8 @@
+# IMPORTANT
+We have noticed issues with installing dependencies.
+With `Flask-Reuploaded` it installs it's files as `Flask-uploads`, which is a different Flask package. So if you are having issues with: `from flask_uploads import UploadSet, configure_uploads, IMAGES`.
+MAKE SURE YOU `pip uninstall Flask-Uploads` and then `pip install Flask-Reuploaded`.
+
 # Update dependencies to installation file
 `pip freeze > requirements.txt`  
 
