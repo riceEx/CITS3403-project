@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_session import Session
 from flask_socketio import SocketIO
-from flask_uploads import UploadSet, configure_uploads, IMAGES
 from sqlalchemy import func, event
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
@@ -40,7 +40,10 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', user=current_user)
+    # Query all posts from the database
+    posts = Post.query.all()
+    # Render the index.html template and pass the posts to it
+    return render_template('index.html', user=current_user, posts=posts)
 
 
 
@@ -50,7 +53,18 @@ def createpost():
  
 @app.route('/leaderboard')
 def leaderboard():
-    return render_template('leaderboard.html', user=current_user)
+    # Fetch top 10 scores in descending order
+    top_scores = Score.query.order_by(Score.score.desc()).limit(10).all()
+    
+    # Fetch corresponding user details
+    data = []
+    rank = 1
+    for score in top_scores:
+        user = User.query.get(score.user_id)
+        data.append({"rank": rank, "username": user.username, "score": score.score})
+        rank += 1
+
+    return render_template('leaderboard.html', data=data, current_user=current_user)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -369,6 +383,51 @@ def get_scores():
     flash('Score fetched!', 'success')
     # return result as JSON
     return jsonify({"result": result, "total": scores.total})
+
+@app.route('/post-details/<int:post_id>')
+@login_required
+def post_details(post_id):
+    # Retrieve post details using the post_id
+    # Query all posts from the database
+    # Query the post with the specified post_id
+    post = Post.query.filter_by(id=post_id).first()
+    # Pass post details to the template
+    if post:
+        # Pass post details to the template
+        # Query comments associated with the post
+        comments = Comment.query.filter_by(post_id=post_id).all()
+        return render_template('post.html', user=current_user, post=post, comments=comments)
+    else:
+        # Handle the case where the post with the given ID does not exist
+        flash('Post not found.', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/check-answer/<int:post_id>', methods=['POST'])
+@login_required
+def check_answer(post_id):
+    # Retrieve post details using the post_id
+    post = Post.query.filter_by(id=post_id).first()
+
+    if post:
+        # Get the submitted answer from the form
+        submitted_answer = request.form.get('answer')
+        print(submitted_answer)
+        print(post.content)
+
+        # Check if the submitted answer is correct
+        if submitted_answer == post.content:
+            # If correct, return a response indicating success
+            post.status = True
+            db.session.commit()
+
+            return jsonify({'message': 'Correct!'})
+        else:
+            # If incorrect, return a response indicating failure
+            return jsonify({'message': 'Wrong!'})
+    else:
+        # Handle the case where the post with the given ID does not exist
+        return jsonify({'message': 'Post not found.'}), 404
+
 
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
 @app.errorhandler(Unauthorized)

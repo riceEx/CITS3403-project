@@ -109,19 +109,19 @@
         </style>
 
         <div class="header">
-            <h1>Riddle's RabbitHole <img src="templates/rabbit.png" class="rabbitimg"></h1>   
+            <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b> <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1>   
         </div>
 
     </head>    
 
-    <body>       
+    <body style="background-color: #EDf4F2">       
 
     <div class="sidebar" id="sidebar">
     <div class="login-tab" id="loginButton" onclick="toggleLogin()">
         {% if current_user.is_authenticated %}
-            <br><br><br> 
+            <br><br><br> <b>
             Hello
-            {{ current_user.username }}!
+            {{ current_user.username }}!</b>
             <br><br>
             <button class="lognew" onclick="logout()">Logout</button>
             <br>
