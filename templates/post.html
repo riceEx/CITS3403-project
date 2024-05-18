@@ -86,18 +86,18 @@
 
     </style>
 </head>
-<body>
+<body style="background-color: #EDF4F2;">
 
     <div class="header">
-        <h1>Riddle's RabbitHole <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
+        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b><img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
     </div>
 
     <div class="sidebar" id="sidebar">
         <div class="login-tab" id="loginButton" onclick="toggleLogin()">
             {% if current_user.is_authenticated %}
-                <br><br><br>
+                <br><br><br><b>
                 Hello 
-                {{ current_user.username }}!
+                {{ current_user.username }}!</b>
                 <br><br>
                 <button class="lognew" onclick="logout()">Logout</button>
             {% else %}
@@ -129,20 +129,107 @@
     
     </div>
  
-    <div class="containerl">
-        <h1>Post Details</h1>
-        <div>
-            <h2>{{ post.content }}</h2>
-            <p>{{ post.hint }}</p>
-            <p>Language: {{ post.language }}</p>
-            <p>Status: {% if post.status %}Completed{% else %}Active{% endif %}</p>
-            <!-- Add more details as needed -->
+    <div class="row d-flex justify-content-center mt-100 mb-100" style="margin-top: 120px;">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Post Details</h4>
+                </div>
+                <div>
+                    <div class="card-body">
+                    {% if post.images %}
+                    <img src="{{ url_for('static', filename='post_images/' + post.images[0].url) }}" alt="Post Image" class="img-fluid card-img-top">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='post_images/default.jpg') }}" alt="Post Image123" class="img-fluid card-img-top">
+                    {% endif %}
+                    <p>{{ post.hint }}</p>
+                    
+                        <form id="answerForm" onsubmit="submitAnswer(event)">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="answer" name="answer" placeholder="Type your answer here" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <div id="answerMessage"></div> 
+                        </form>
+                    
+                    <div class="d-flex align-items-center justify-content-between rounded-pill bg-light px-3 py-2 mt-4">
+                        <p class="small mb-0"><span class="font-weight-bold">{{ post.language }}</span></p>
+                        <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-danger{% else %}badge-success{% endif %} px-3 rounded-pill font-weight-normal">
+                            {% if post.status %}
+                                Complete
+                            {% else %}
+                                Active
+                            {% endif %}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center mt-100 mb-100">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Latest Comments</h4>
+                </div>
+                <div class="comment-widgets">
+                    <!-- Comment Row -->
+                    {% for comment in comments %}
+                        <div class="d-flex flex-row comment-row m-t-0">
+                            <div class="p-2"><img src="https://i.imgur.com/Ur43esv.jpg" alt="user" width="50" class="rounded-circle"></div>
+                            <div class="comment-text w-100">
+                                <h6 class="font-medium">{{ comment.user_id }}</h6> <span class="m-b-15 d-block">{{ comment.content }}</span>
+                                <div class="comment-footer"> <span class="text-muted float-right">{{ comment.datetime }}</span> </div>
+                            </div>
+                        </div>
+                        <li>{{ comment.content }}</li>
+                    {% endfor %}
+                </div> <!-- Card -->
+                <!-- New Comment Form -->
+                <div class="card-body">
+                    <form id="commentForm" onsubmit="submitComment(event)">
+                        <div class="form-group">
+                            <label for="comment">Add Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                    <div class="mb-4" style="text-align: center;">
+                        <a href="{{ url_for('index') }}" class="newbutton">Go back</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 
 <script>
-//requires functions to make it so that the one with the higer score gets updated all the time
+    function submitAnswer(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        // Get the answer value from the input field
+        var answer = document.getElementById("answer").value;
+
+        // Send an asynchronous POST request to the server to check the answer
+        fetch("/check-answer/{{ post.id }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded" // Change content type to x-www-form-urlencoded
+            },
+            body: "answer=" + encodeURIComponent(answer) // Encode the answer parameter
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display the answer message on the page
+            document.getElementById("answerMessage").innerText = data.message;
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+
+
 
 
 </script>

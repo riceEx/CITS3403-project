@@ -21,6 +21,7 @@
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             z-index: 999;
             transition: width 0.3s ease-in-out;
+            color: #EDF4F2;
         }
         .expanded {
             width: 300px;
@@ -51,11 +52,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            background-color: #afafaf;
+            background-color: #31473A;
             color: rgb(40, 40, 40);
             padding: 10px 15px;
             text-align: center;
             z-index: 9999;
+            color: #7C8363;
         }
         .rabbitimg {
             vertical-align: right;
@@ -83,6 +85,7 @@
             background-size: auto;
             background-repeat: no-repeat;
             background-position: center center;
+            background-color: #EDF4F2;
         }
 
         
@@ -95,7 +98,7 @@
         }
         .bigger-button-container{
             width: 100%;
-            background-color: rgb(255, 235, 163);
+            background-color: #EDF4F2;
             margin-left: 20px;
             padding-top: 1px;
             padding-bottom: 6px;
@@ -106,10 +109,10 @@
         }
     </style>
 </head>
-<body>
+<body style="background-color: #EDf4F2">
 
     <div class="header">
-        <h1>Riddle's RabbitHole  <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg">  </h1>
+        <h1><b>Riddle's RabbitHole</b>  <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg">  </h1>
     </div>
     <br>
     <div class="bigger-button-container">
@@ -130,7 +133,7 @@
     
         <div class="login-tab" id="loginButton" onclick="toggleLogin()">
             {% if current_user.is_authenticated %}
-                <br><br><br>
+                <br><br><br><b>
                 Hello 
                 {{ current_user.username }}!
                 <br><br>
@@ -164,7 +167,7 @@
         <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}Filters{% else %}{% endif %}</div>
 
         <div class="filters-container" id="filtersContainer">
-            <h3>Filters</h3>
+            <h3>Filters</h3></b>
             <label for="exactWordLengthFilter">Word Length:</label>
 
             <select id="exactWordLengthFilter" onchange="updatePostsView()">

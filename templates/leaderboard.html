@@ -50,6 +50,7 @@
             background-position: center center; 
             background-attachment: fixed; 
             height: 100vh;
+            background-color: #EDf4F2;
         }
         .containerl {
             max-width: 800px;
@@ -89,15 +90,16 @@
 <body>
 
     <div class="header">
-        <h1>Riddle's RabbitHole <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
+        <b><h1 style="color: #7C8363;">Riddle's RabbitHole </b><img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
     </div>
 
     <div class="sidebar" id="sidebar">
         <div class="login-tab" id="loginButton" onclick="toggleLogin()">
             {% if current_user.is_authenticated %}
                 <br><br><br>
-                Hello 
-                {{ current_user.username }}!
+                <b>
+                Hello
+                {{ current_user.username }}!</b>
                 <br><br>
                 <button class="lognew" onclick="logout()">Logout</button>
             {% else %}

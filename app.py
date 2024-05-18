@@ -394,11 +394,39 @@ def post_details(post_id):
     # Pass post details to the template
     if post:
         # Pass post details to the template
-        return render_template('post.html', user=current_user, post=post)
+        # Query comments associated with the post
+        comments = Comment.query.filter_by(post_id=post_id).all()
+        return render_template('post.html', user=current_user, post=post, comments=comments)
     else:
         # Handle the case where the post with the given ID does not exist
         flash('Post not found.', 'error')
         return redirect(url_for('index'))
+
+@app.route('/check-answer/<int:post_id>', methods=['POST'])
+@login_required
+def check_answer(post_id):
+    # Retrieve post details using the post_id
+    post = Post.query.filter_by(id=post_id).first()
+
+    if post:
+        # Get the submitted answer from the form
+        submitted_answer = request.form.get('answer')
+        print(submitted_answer)
+        print(post.content)
+
+        # Check if the submitted answer is correct
+        if submitted_answer == post.content:
+            # If correct, return a response indicating success
+            post.status = True
+            db.session.commit()
+
+            return jsonify({'message': 'Correct!'})
+        else:
+            # If incorrect, return a response indicating failure
+            return jsonify({'message': 'Wrong!'})
+    else:
+        # Handle the case where the post with the given ID does not exist
+        return jsonify({'message': 'Post not found.'}), 404
 
 
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
