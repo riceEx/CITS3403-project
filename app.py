@@ -384,6 +384,23 @@ def get_scores():
     # return result as JSON
     return jsonify({"result": result, "total": scores.total})
 
+@app.route('/post-details/<int:post_id>')
+@login_required
+def post_details(post_id):
+    # Retrieve post details using the post_id
+    # Query all posts from the database
+    # Query the post with the specified post_id
+    post = Post.query.filter_by(id=post_id).first()
+    # Pass post details to the template
+    if post:
+        # Pass post details to the template
+        return render_template('post.html', user=current_user, post=post)
+    else:
+        # Handle the case where the post with the given ID does not exist
+        flash('Post not found.', 'error')
+        return redirect(url_for('index'))
+
+
 # This error is sent when a user tries to bypass routes requiring @login_required while being 'un-logged in'.
 @app.errorhandler(Unauthorized)
 def unauthorized(error):

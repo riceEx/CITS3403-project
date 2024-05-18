@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Leaderboard</title>
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left:0;
+            width: 80px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: width 0.3s ease-in-out;
+        }
+        .expanded {
+            width: 300px;
+        }
+        .hideword{
+            display: none;
+        }
+        .filters-container, .login-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .filters-container.show, .login-container.show {
+            display: block;
+        }
+        .filters-container label, .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .filters-container select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('rabbitbackgound.png');
+            background-size: cover;
+            background-repeat: no-repeat; 
+            background-position: center center; 
+            background-attachment: fixed; 
+            height: 100vh;
+        }
+        .containerl {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #262626;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Riddle's RabbitHole <img src="{{ url_for('static', filename='img/rabbit.png') }}" class="rabbitimg"></h1> 
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="login-tab" id="loginButton" onclick="toggleLogin()">
+            {% if current_user.is_authenticated %}
+                <br><br><br>
+                Hello 
+                {{ current_user.username }}!
+                <br><br>
+                <button class="lognew" onclick="logout()">Logout</button>
+            {% else %}
+                <br><br><br> 
+                Login
+            {% endif %}
+        </div>
+        <div class="login-container" id="loginContainer">
+            {% if current_user.is_authenticated %}
+                
+            {% else %}
+                <h3>Login</h3>
+                <form id="loginForm" method="POST" action="/login">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="lognew">Login</button>
+                </form>
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+            {% endif %}
+        </div>  
+            <!-- Placeholder so that the sidebar can extend. It uses the filter functions to extend -->
+        <div class="filters-tab" id="filterButton" onclick="toggleFilters()">{% if current_user.is_authenticated %}<p1 class="hideword">Invisible word</p1>{% else %}{% endif %}</div>
+    
+    </div>
+ 
+    <div class="containerl">
+        <h1>Post Details</h1>
+        <div>
+            <h2>{{ post.content }}</h2>
+            <p>{{ post.hint }}</p>
+            <p>Language: {{ post.language }}</p>
+            <p>Status: {% if post.status %}Completed{% else %}Active{% endif %}</p>
+            <!-- Add more details as needed -->
+        </div>
+    </div>
+
+
+<script>
+//requires functions to make it so that the one with the higer score gets updated all the time
+
+
+</script>
+<script src="static/js/script.js"></script>
+</body>
+</html>

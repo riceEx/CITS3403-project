@@ -240,15 +240,15 @@
                                 <img src="{{ url_for('static', filename='post_images/default.jpg') }}" alt="Post Image123" class="img-fluid card-img-top">
                                 {% endif %}
                                 <div class="p-4">
-                                    <h5> <a href="#" class="text-dark">{{ post.content }}</a></h5>
+                                    <div class="post" data-post-id="{{ post.id }}"><h5> <a href="#" class="text-dark">{{ post.content }}</a></h5></div>
                                     <p class="small text-muted mb-0">{{ post.hint }}</p>
                                     <div class="d-flex align-items-center justify-content-between rounded-pill bg-light px-3 py-2 mt-4">
                                         <p class="small mb-0"><span class="font-weight-bold">{{ post.language }}</span></p>
-                                        <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-success{% else %}badge-danger{% endif %} px-3 rounded-pill font-weight-normal">
+                                        <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-danger{% else %}badge-success{% endif %} px-3 rounded-pill font-weight-normal">
                                             {% if post.status %}
-                                                Active
-                                            {% else %}
                                                 Complete
+                                            {% else %}
+                                                Active
                                             {% endif %}
                                         </div>
                                     </div>
@@ -294,28 +294,28 @@
 <script src="static/js/script.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-function addPostImageTest() {
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    const postId = posts.length + 1; // Calculate next post ID based on the array length
-       // Retrieve the images associated with this post from sessionStorage
-       const uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};
-    const photos = uploadedPhotos[postId] || []; // Retrieve photos using the postId
+    function addPostImageTest() {
+        let posts = JSON.parse(localStorage.getItem('posts')) || [];
+        const postId = posts.length + 1; // Calculate next post ID based on the array length
+        // Retrieve the images associated with this post from sessionStorage
+        const uploadedPhotos = JSON.parse(sessionStorage.getItem('uploadedPhotos')) || {};
+        const photos = uploadedPhotos[postId] || []; // Retrieve photos using the postId
 
-    $.post('/add_post', {content: 'apple', hint: '', language: 'es', images: photos});
-}
+        $.post('/add_post', {content: 'apple', hint: '', language: 'es', images: photos});
+    }
 
     // Function to show posts based on status
     function showPosts(status) {
         var posts = document.getElementsByClassName('col-xl-3');
         for (var i = 0; i < posts.length; i++) {
             if (status === 'active') {
-                if (posts[i].querySelector('p[data-status]').dataset.status === 'True') {
+                if (posts[i].querySelector('p[data-status]').dataset.status === 'False') {
                     posts[i].style.display = 'block';
                 } else {
                     posts[i].style.display = 'none';
                 }
             } else if (status === 'completed') {
-                if (posts[i].querySelector('p[data-status]').dataset.status === 'False') {
+                if (posts[i].querySelector('p[data-status]').dataset.status === 'True') {
                     posts[i].style.display = 'block';
                 } else {
                     posts[i].style.display = 'none';
@@ -323,6 +323,13 @@ function addPostImageTest() {
             }
         }
     }
+
+    $(document).ready(function() {
+        $(".post").click(function() {
+            var postId = $(this).data("post-id");
+            window.location.href = "/post-details/" + postId;
+        });
+    });
 </script>
 
 
