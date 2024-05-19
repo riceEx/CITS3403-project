@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <title>Leaderboard</title>
+    <title>Post Details</title>
     <style>
         .sidebar {
             position: fixed;
@@ -44,9 +44,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('rabbitbackgound.png');
-            background-size: cover;
-            background-repeat: no-repeat; 
+
             background-position: center center; 
             background-attachment: fixed; 
             height: 100vh;
@@ -89,7 +87,7 @@
 <body style="background-color: #EDF4F2;">
 
     <div class="header">
-        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b><img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1> 
+        <h1 style="color: #7C8363"><b>Riddler's RabbitHole</b><img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1> 
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -156,9 +154,9 @@
                         <p class="small mb-0"><span class="font-weight-bold">{{ post.language }}</span></p>
                         <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-danger{% else %}badge-success{% endif %} px-3 rounded-pill font-weight-normal">
                             {% if post.status %}
-                                Complete
+                                Solved
                             {% else %}
-                                Active
+                                Unsolved
                             {% endif %}
                         </div>
                     </div>

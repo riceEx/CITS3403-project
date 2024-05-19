@@ -49,9 +49,7 @@
             align-items: center;
             min-height: 100vh; 
             background-color: #ffffff; 
-            background-image: url('images/rabbitbackground.jpg');
-            background-size: cover; 
-            background-position: center center;
+
         }
         #newPostHint {
             width: 100%;
@@ -113,7 +111,7 @@
 
 <body style="background-color: #EDf4F2">
     <div class="header">
-        <h1 style="color: #7C8363"><b>Riddle's RabbitHole</b> <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1>   
+        <h1 style="color: #7C8363"><b>Riddler's RabbitHole</b> <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg"></h1>   
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -182,14 +180,14 @@
         <p>Add Pictures for More Depth!</p>
         <p>Create your very own riddle and let others solve it!</p>
         <p>Enter the answer so that we know what you genius mind had came up with!</p>
-        
+        <p>Make sure to Validate! Or else the post won't get uploaded!</p>
         <input type="text" id="newPostHint" placeholder="Enter the Riddle">
         <input type="text" id="newPostContent" placeholder="Enter the answer">
 
         <div id="postcontainer">
             <input type="file" id="photoUpload" multiple accept="image/*" onchange="uploadPhotos(event)" style="margin-bottom: 20px;">
+            <button class="newbutton" onclick="addPostImageTest()">Validate</button>
             <button class="newbutton" onclick="Posted()">Add Post</button>
-            <button class="newbutton" onclick="addPostImageTest()">Add image to server</button>
             <div id="photoPreviewContainer" style="width: 100%; min-height: 100px; border: 1px solid #ccc; margin-top: 20px; padding: 10px;">
                 <ul id="sortablePhotoList" style="list-style-type: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;"></ul>
             </div>

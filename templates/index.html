@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Forum</title>
+    <title>Home Page</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
@@ -80,7 +80,6 @@
 
         }
         .body {
-            background-image: url('rabbitbackground.png');
             background-size: auto;
             background-repeat: no-repeat;
             background-position: center center;
@@ -111,7 +110,7 @@
 <body style="background-color: #EDf4F2">
 
     <div class="header">
-        <h1><b>Riddle's RabbitHole</b>  <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg">  </h1>
+        <h1><b>Riddler's RabbitHole</b>  <img src="{{ url_for('static', filename='img/rabbit.png') }}" alt="" class="rabbitimg">  </h1>
     </div>
     <br>
     <div class="bigger-button-container">
@@ -222,8 +221,8 @@
     <!-- Logged in User View -->
 
     <div class="tabs">
-        <button class="newbutton tab-button" onclick="showPosts('active')">Active Posts</button>
-        <button class="newbutton tab-button" onclick="showPosts('completed')">Completed Posts</button>
+        <button class="newbutton tab-button" onclick="showPosts('active')">Unsolved Posts</button>
+        <button class="newbutton tab-button" onclick="showPosts('completed')">Solved Posts</button>
     </div>
     <br><br>
 </div>   
@@ -242,15 +241,14 @@
                                 <img src="{{ url_for('static', filename='post_images/default.jpg') }}" alt="Post Image123" class="img-fluid card-img-top">
                                 {% endif %}
                                 <div class="p-4">
-                                    <div class="post" data-post-id="{{ post.id }}"><h5> <a href="#" class="text-dark">{{ post.content }}</a></h5></div>
-                                    <p class="small text-muted mb-0">{{ post.hint }}</p>
+                                    <div class="post" data-post-id="{{ post.id }}"><h5> <a href="#" class="text-dark">{{ post.hint }}</a></h5></div>
                                     <div class="d-flex align-items-center justify-content-between rounded-pill bg-light px-3 py-2 mt-4">
                                         <p class="small mb-0"><span class="font-weight-bold">{{ post.language }}</span></p>
                                         <p data-status="{{ post.status }}"></p><div class="badge {% if post.status %}badge-danger{% else %}badge-success{% endif %} px-3 rounded-pill font-weight-normal">
                                             {% if post.status %}
-                                                Complete
+                                                Solved
                                             {% else %}
-                                                Active
+                                                Unsolved
                                             {% endif %}
                                         </div>
                                     </div>
